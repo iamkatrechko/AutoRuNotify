@@ -1,0 +1,36 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+    </style>
+
+    <style name="AppTheme.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar"/>
+
+    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light"/>
+
+
+    <style name="default_button">
+        <item name="android:background">@drawable/button_number_selector0</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:textColor">#313131</item>
+        <item name="android:stateListAnimator" tools:ignore="NewApi">@null</item>
+    </style>
+
+    <style name="TextLabel" parent="ThemeOverlay.AppCompat.Light">
+        <!-- Hint color and label color in FALSE state -->
+        <item name="android:textColorHint">#ebebeb</item>
+        <!-- Label color in TRUE state and bar color FALSE and TRUE State -->
+        <item name="colorAccent">#ebebeb</item>
+        <item name="colorControlNormal">#ebebeb</item>
+        <item name="colorControlActivated">#ebebeb</item>
+    </style>
+</resources>

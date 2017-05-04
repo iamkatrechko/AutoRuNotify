@@ -1,0 +1,24 @@
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Allows the user to choose a ringtone in the 'notification' category. -->
+    <!-- NOTE: This preference will be enabled only when the checkbox above is checked. -->
+    <!-- NOTE: RingtonePreference's summary should be set to its value by the activity code. -->
+    <RingtonePreference
+        android:defaultValue="content://settings/system/notification_sound"
+        android:key="notifications_new_message_ringtone"
+        android:ringtoneType="notification"
+        android:title="Рингтон"/>
+
+    <!-- A 'parent' preference, which enables/disables child preferences (below)
+         when checked/unchecked. -->
+    <SwitchPreference
+        android:defaultValue="true"
+        android:key="notifications_new_message"
+        android:title="Вибрация"/>
+
+    <SwitchPreference
+        android:defaultValue="false"
+        android:key="only_wifi"
+        android:title="Искать только через Wi-Fi"/>
+
+</PreferenceScreen>
