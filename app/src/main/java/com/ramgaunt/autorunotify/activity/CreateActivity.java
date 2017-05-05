@@ -24,8 +24,6 @@ public class CreateActivity extends AppCompatActivity {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
 
-
-
         int ID = getIntent().getIntExtra("ID", -1);
 
         FragmentManager fragmentManager = getSupportFragmentManager();

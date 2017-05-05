@@ -27,15 +27,12 @@ import android.widget.Toast;
 
 import com.anjlab.android.iab.v3.BillingProcessor;
 import com.anjlab.android.iab.v3.TransactionDetails;
-import com.ramgaunt.autorunotify.ArticleSearcher;
-import com.ramgaunt.autorunotify.DownloadManager;
 import com.ramgaunt.autorunotify.activity.CreateActivity;
 import com.ramgaunt.autorunotify.dialog.DialogBuyFragment;
 import com.ramgaunt.autorunotify.dialog.DialogInfoFragment;
 import com.ramgaunt.autorunotify.dialog.DialogReviewFragment;
 import com.ramgaunt.autorunotify.Methods;
 import com.ramgaunt.autorunotify.activity.NotWorkActivity;
-import com.ramgaunt.autorunotify.entity.Article;
 import com.ramgaunt.autorunotify.entity.Query;
 import com.ramgaunt.autorunotify.QueryLab;
 import com.ramgaunt.autorunotify.R;
@@ -43,10 +40,8 @@ import com.ramgaunt.autorunotify.service.SearchIntentService;
 import com.ramgaunt.autorunotify.activity.SettingsActivity;
 import com.ramgaunt.autorunotify.activity.TestActivity;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 public class MainActivityFragment extends Fragment {
     private final String TAG = "MainActivityFragment";

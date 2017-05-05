@@ -24,6 +24,8 @@ import java.util.ArrayList;
 public class BrowserActivityFragment extends Fragment {
     private static String TAG = "BrowserActivityFragment";
 
+    private String currentURI;
+
     private WebView mWebView;
     private LinearLayout linEmpty;
     private ProgressBar mProgressBar;
@@ -43,7 +45,7 @@ public class BrowserActivityFragment extends Fragment {
         View v = inflater.inflate(R.layout.fragment_browser, container, false);
 
 
-        final String URI = getArguments().getString("URI");
+        currentURI = getArguments().getString("URI");
 
         mWebView = (WebView) v.findViewById(R.id.webView);
         linEmpty = (LinearLayout) v.findViewById(R.id.linEmpty);
@@ -59,7 +61,7 @@ public class BrowserActivityFragment extends Fragment {
         mProgressBar.setMax(100); // Значения в диапазоне 0-100
         mWebView.getSettings().setJavaScriptEnabled(true);
 
-        mWebView.loadUrl(URI);
+        mWebView.loadUrl(currentURI);
 
         mWebView.setWebChromeClient(new WebChromeClient() {
             public void onProgressChanged(WebView webView, int newProgress) {
@@ -76,7 +78,7 @@ public class BrowserActivityFragment extends Fragment {
             @Override
             public void onPageFinished(WebView view, String url) {
                 super.onPageFinished(view, url);
-                String js = "javascript:document.getElementsByClassName('b-header')[0].style.display = \"none\";" +
+                /*String js = "javascript:document.getElementsByClassName('b-header')[0].style.display = \"none\";" +
                         "document.getElementsByClassName('b-tabs')[0].style.display = \"none\";" +
                         "document.getElementsByClassName('b-nav-helper')[0].style.display = \"none\";" +
                         "document.getElementsByClassName('control-self-submit')[0].value = \"Поиск\";";
@@ -89,7 +91,7 @@ public class BrowserActivityFragment extends Fragment {
                     });
                 } else {
                     view.loadUrl(js);
-                }
+                }*/
                 showWebView(true);
             }
 
@@ -97,11 +99,19 @@ public class BrowserActivityFragment extends Fragment {
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
                 if (!checkURL(url)) return true;
                 Log.d(TAG, url);
+                currentURI = url;
+
+                return false;
+            }
+        });
+
+        v.findViewById(R.id.button_save_settings).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
                 Intent i = new Intent();
-                i.putExtra("ResultURI", url);
+                i.putExtra("ResultURI", currentURI);
                 getActivity().setResult(Activity.RESULT_OK, i);
                 getActivity().finish();
-                return true;
             }
         });
 

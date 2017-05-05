@@ -159,14 +159,6 @@ public class CreateActivityFragment extends Fragment implements View.OnClickList
         }
     }
 
-    private String getParametrs(String URI){
-        String startText = "avito.ru/";
-        if (!URI.contains(startText)){
-            return "rossiya";
-        }
-        return URI.substring(URI.indexOf(startText) + startText.length());
-    }
-
     @Override
     public void onClick(View view) {
         int id = view.getId();
@@ -184,7 +176,7 @@ public class CreateActivityFragment extends Fragment implements View.OnClickList
                 break;
             case R.id.linURI:
                 Intent i = new Intent(getActivity(), BrowserActivity.class);
-                i.putExtra("URI", "https://m.avito.ru/search/" + getParametrs(tvURI.getText().toString()));
+                i.putExtra("URI", getParametrs());
                 startActivityForResult(i, 0);
                 break;
             case R.id.linResult:
@@ -227,6 +219,20 @@ public class CreateActivityFragment extends Fragment implements View.OnClickList
                 getActivity().finish();
                 break;
         }
+    }
+
+    private String getParametrs() {
+        String URI = tvURI.getText().toString();
+        if (URI.equals("Нажмите для настройки")) {
+            return "https://m.auto.ru/";
+        }
+
+        return URI;
+        /*String startText = "avito.ru/";
+        if (!URI.contains(startText)){
+            return "rossiya";
+        }
+        return URI.substring(URI.indexOf(startText) + startText.length());*/
     }
 
     private String getPeriodText(int period){

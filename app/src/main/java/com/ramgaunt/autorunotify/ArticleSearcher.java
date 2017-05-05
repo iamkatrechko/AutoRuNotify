@@ -1,6 +1,7 @@
 package com.ramgaunt.autorunotify;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.ramgaunt.autorunotify.entity.Article;
 import com.ramgaunt.autorunotify.entity.Query;
@@ -10,6 +11,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ArticleSearcher {
+
+    private static final String TAG = ArticleSearcher.class.getSimpleName();
+
     private DownloadManager mDownloadManager;
 
     public ArticleSearcher() {
@@ -19,8 +23,8 @@ public class ArticleSearcher {
     public Article checkUpdate(Context context, Query query) {
         String result = "";
         try {
-            //result = mDownloadManager.getUrlString(query.getURI());
-            result = mDownloadManager.getUrlString(context, "https://m.auto.ru/cars/lexus/gx/all/?image=true&sort_offers=cr_date-DESC&page_num_offers=1");
+            result = mDownloadManager.getUrlString(context, query.getURI());
+            //result = mDownloadManager.getUrlString(context, "https://m.auto.ru/cars/lexus/gx/all/?image=true&sort_offers=cr_date-DESC&page_num_offers=1");
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -99,6 +103,8 @@ public class ArticleSearcher {
             return article;
         }
 
+        Log.d(TAG, result);
+        Log.d(TAG, "Пустой результат");
         return null;
     }
 

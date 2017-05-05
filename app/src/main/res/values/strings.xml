@@ -18,6 +18,11 @@
     <string name="send_mail">Написать разработчику...</string>
     <string name="send">Выберите приложение для отправки...</string>
 
+    <string name="search_settings_info">Настройте параметры и нажмите кнопку \"Сохранить поиск\"</string>
+    <string name="search_settings_loading">Подождите, идет загрузка... (через интернет)</string>
+    <string name="search_settings_show">Показать принудительно</string>
+    <string name="search_settings_save">Сохранить поиск</string>
+
     <string name="action_buy_info">Снять ограничения</string>
     <string name="buy_info">Для создания более 1-го автопоиска необходимо преобрести одну из лицензий:</string>
     <string name="license_info">* Для покупки следует нажать на выбранный тариф\n** Лицензия оплачивается только один раз и выдается навсегда</string>

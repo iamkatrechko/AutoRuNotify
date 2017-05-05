@@ -1,54 +1,55 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context="com.iamkatrechko.avitonotify.fragment.BrowserActivityFragment">
+    >
 
     <LinearLayout
-        android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="48dp"
+        android:background="#303030"
         android:gravity="center_vertical"
-        android:background="#303030">
+        android:orientation="horizontal">
 
         <ImageView
             android:layout_width="32dp"
             android:layout_height="32dp"
-            android:src="@drawable/ic_info"
             android:layout_margin="8dp"
+            android:src="@drawable/ic_info"
             android:tint="#d8d8d8"/>
 
         <TextView
+            android:id="@+id/textView3"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Настройте параметры и нажмите кнопку &quot;Поиск&quot;"
-            android:id="@+id/textView3"
             android:layout_marginLeft="8dp"
+            android:text="@string/search_settings_info"
             android:textColor="#d8d8d8"/>
     </LinearLayout>
 
     <ProgressBar
         android:id="@+id/fragment_photo_page_progress_bar"
+        style="?android:attr/progressBarStyleHorizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        style="?android:attr/progressBarStyleHorizontal"
-        android:background="#303030"
-        android:layout_weight="0"/>
+        android:layout_weight="0"
+        android:background="#303030"/>
 
     <WebView
+        android:id="@+id/webView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/webView"
         android:layout_weight="1"
         android:visibility="gone"/>
 
     <LinearLayout
-        android:orientation="vertical"
+        android:id="@+id/linEmpty"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/linEmpty"
-        android:gravity="center">
+        android:layout_weight="1"
+        android:gravity="center"
+        android:orientation="vertical">
 
         <ImageView
             android:layout_width="128dp"
@@ -59,18 +60,28 @@
         <TextView
             android:layout_width="270dp"
             android:layout_height="wrap_content"
-            android:text="Подождите, идет загрузка... (через интернет)"
+            android:gravity="center_horizontal"
+            android:text="@string/search_settings_loading"
             android:textColor="#a0a0a0"
-            android:textSize="17sp"
-            android:gravity="center_horizontal"/>
+            android:textSize="17sp"/>
 
         <Button
+            android:id="@+id/button3"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Показать принудительно"
-            android:id="@+id/button3"
             android:background="#00000000"
             android:singleLine="true"
+            android:text="@string/search_settings_show"
             android:textColor="#292929"/>
     </LinearLayout>
+
+    <Button
+        android:id="@+id/button_save_settings"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#303030"
+        android:text="@string/search_settings_save"
+        android:textColor="#ffffff"
+        />
+
 </LinearLayout>
