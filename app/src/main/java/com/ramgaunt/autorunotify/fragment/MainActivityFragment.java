@@ -1,13 +1,11 @@
 package com.ramgaunt.autorunotify.fragment;
 
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.os.AsyncTask;
+import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
-import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
@@ -19,31 +17,31 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CompoundButton;
 import android.widget.LinearLayout;
-import android.widget.Switch;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.anjlab.android.iab.v3.BillingProcessor;
 import com.anjlab.android.iab.v3.TransactionDetails;
+import com.ramgaunt.autorunotify.Methods;
+import com.ramgaunt.autorunotify.QueryLab;
+import com.ramgaunt.autorunotify.R;
 import com.ramgaunt.autorunotify.activity.CreateActivity;
+import com.ramgaunt.autorunotify.activity.NotWorkActivity;
+import com.ramgaunt.autorunotify.activity.SettingsActivity;
+import com.ramgaunt.autorunotify.activity.TestActivity;
+import com.ramgaunt.autorunotify.adapter.QueriesCursorAdapter;
 import com.ramgaunt.autorunotify.dialog.DialogBuyFragment;
 import com.ramgaunt.autorunotify.dialog.DialogInfoFragment;
 import com.ramgaunt.autorunotify.dialog.DialogReviewFragment;
-import com.ramgaunt.autorunotify.Methods;
-import com.ramgaunt.autorunotify.activity.NotWorkActivity;
 import com.ramgaunt.autorunotify.entity.Query;
-import com.ramgaunt.autorunotify.QueryLab;
-import com.ramgaunt.autorunotify.R;
 import com.ramgaunt.autorunotify.service.SearchIntentService;
-import com.ramgaunt.autorunotify.activity.SettingsActivity;
-import com.ramgaunt.autorunotify.activity.TestActivity;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 
-public class MainActivityFragment extends Fragment {
+/**
+ * Фрагмент со список всех созданных поисков
+ */
+public class MainActivityFragment extends Fragment implements QueriesCursorAdapter.OnEmptyListener {
     private final String TAG = "MainActivityFragment";
     private final String KEY = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAhxHTDrY2VjM++xnA7HII5YvouX9gr8Fptsy4TTLwikETLWT8DcuT4oM9DMCetV8XHg69kz94PQIaf59p9TLL/wEaIFETcKX6xh0N+avqw2yFdEfN6q8Bs4Sjxm12Ca6vrW61I/mQptgmlizIiz60Zw8N/SBQqMJlL+IqU/W5qcZEiubfuUPIEBIofMnoWmC6j8f4yH2C9EDb49mmDI7/OBSqr8jw0b5gQTs9Q/lED5gsXU5OHusoX2TWabrB5CSZ+n4/aaGf1zkdldArUOADM+K+EnujoB5hil5j9c+6dlQy1EDUXsiP/nq63oFr5fOsA7SZu5CaoYjq6bTVYYHjbQIDAQAB";
     private final String PREMIUM_IDENTIFIER_1 = "premium_identifier_1";
@@ -65,10 +63,7 @@ public class MainActivityFragment extends Fragment {
     private LinearLayout linEmpty;
     private BillingProcessor bp;
 
-    private String[] mPeriodsNames;
-    private int[] mPeriodsValues;
-
-    public static MainActivityFragment newInstance(){
+    public static MainActivityFragment newInstance() {
         return new MainActivityFragment();
     }
 
@@ -80,8 +75,7 @@ public class MainActivityFragment extends Fragment {
         queryLab = QueryLab.get(getActivity());
 
         mMethods.incrementStartCount();
-        mPeriodsNames = getResources().getStringArray(R.array.periods);
-        mPeriodsValues = getResources().getIntArray(R.array.periods_values);
+
 
         bp = new BillingProcessor(getActivity(), KEY, new BillingProcessor.IBillingHandler() {
             @Override
@@ -116,7 +110,7 @@ public class MainActivityFragment extends Fragment {
         linEmpty = (LinearLayout) v.findViewById(R.id.linEmpty);
         recyclerView = (RecyclerView) v.findViewById(R.id.section_list);                            //Находим ID виджета
 
-        adapter = new QueriesCursorAdapter(queryLab.getAll(), getActivity());
+        adapter = new QueriesCursorAdapter(queryLab.getAll(), getActivity(), this);
 
         recyclerView.setHasFixedSize(true);                                                         //Фиксируем размер виджета recyclerView
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
@@ -126,9 +120,9 @@ public class MainActivityFragment extends Fragment {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (queryLab.getQueries().size() >= mMethods.getAllowedSearches()){
+                if (queryLab.getQueries().size() >= mMethods.getAllowedSearches()) {
                     showDialog(DIALOG_BUY);
-                }else{
+                } else {
                     Intent i = new Intent(getActivity(), CreateActivity.class);
                     i.putExtra("ID", -1);
                     startActivity(i);
@@ -136,11 +130,11 @@ public class MainActivityFragment extends Fragment {
             }
         });
 
-        if (mMethods.showDialogReview()){
+        if (mMethods.showDialogReview()) {
             showDialog(DIALOG_REVIEW);
         }
 
-        if (mMethods.getStartCount() == 1){
+        if (mMethods.getStartCount() == 1) {
             showDialog(DIALOG_HOW_IT_WORK);
         }
 
@@ -178,10 +172,10 @@ public class MainActivityFragment extends Fragment {
         super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.menu_main, menu);
 
-        if (mMethods.getPLevel() == 3){
+        if (mMethods.getPLevel() == 3) {
             menu.findItem(R.id.action_unlock).setVisible(false);
         }
-        if (Methods.isDeveloper){
+        if (Methods.isDeveloper) {
             menu.findItem(R.id.action_test).setVisible(true);
         }
     }
@@ -224,17 +218,17 @@ public class MainActivityFragment extends Fragment {
     }
 
     private void recreate() {
-        for (Query query : queryLab.getQueries()){
-            if (query.isOn()){
+        for (Query query : queryLab.getQueries()) {
+            if (query.isOn()) {
                 SearchIntentService.hardAlarmOff(getActivity(), query.getId());
                 SearchIntentService.setServiceAlarm(getActivity(), query.getId(), true);
             }
         }
     }
 
-    private void showDialog(int dialogCode){
+    private void showDialog(int dialogCode) {
         FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
-        switch (dialogCode){
+        switch (dialogCode) {
             case DIALOG_INFO:
                 DialogInfoFragment fragmentDialogInfo = DialogInfoFragment.newInstance();
                 fragmentDialogInfo.setTargetFragment(this, DIALOG_INFO);
@@ -272,10 +266,10 @@ public class MainActivityFragment extends Fragment {
     }
 
     /** Пересоздает поиски, создавая копии и удаляя старые */
-    public void fullRecreate(){
+    public void fullRecreate() {
         ArrayList<Query> list = queryLab.getAll();
 
-        for (Query query : list){
+        for (Query query : list) {
             query.setLastId("-1");
             query.setLastDate("01.01.2001-00:00");
             queryLab.deleteById(query.getId());
@@ -283,9 +277,9 @@ public class MainActivityFragment extends Fragment {
         }
         Toast.makeText(getActivity(), "Поиски пересозданы", Toast.LENGTH_SHORT).show();
 
-        if (adapter != null){
+        if (adapter != null) {
             ArrayList<Query> newList = queryLab.getAll();
-            for (Query query : newList){
+            for (Query query : newList) {
                 SearchIntentService.setServiceAlarm(getActivity(), query.getId(), query.isOn());
             }
 
@@ -294,7 +288,7 @@ public class MainActivityFragment extends Fragment {
         }
     }
 
-    private void showEmpty(boolean isShow){
+    public void showEmpty(boolean isShow) {
         recyclerView.setVisibility(isShow ? View.GONE : View.VISIBLE);
         linEmpty.setVisibility(isShow ? View.VISIBLE : View.GONE);
     }
@@ -303,12 +297,12 @@ public class MainActivityFragment extends Fragment {
      * Проверяет на наличие недопустимых поисков и выключает их, перезаписывая базу
      */
     private void checkAndBlock() {
-        if (queryLab.getQueries().size() > mMethods.getAllowedSearches()){
+        if (queryLab.getQueries().size() > mMethods.getAllowedSearches()) {
             Log.d(TAG, "Количество поисков больше допустимого: " + queryLab.getQueries().size() + ">" + mMethods.getAllowedSearches());
             ArrayList<Query> queries = queryLab.getQueries();
 
-            for (int i = 1; i <= queries.size(); i++){
-                if (i > mMethods.getAllowedSearches()){
+            for (int i = 1; i <= queries.size(); i++) {
+                if (i > mMethods.getAllowedSearches()) {
                     Log.d(TAG, "Отключение поиска #" + i);
                     Query query = queries.get(i - 1);
                     query.setOn(false);
@@ -318,13 +312,13 @@ public class MainActivityFragment extends Fragment {
             }
         }
 
-        if (adapter != null){
+        if (adapter != null) {
             adapter.replaceQueries(queryLab.getAll());
             adapter.notifyDataSetChanged();
         }
     }
 
-    private void checkPremium(){
+    private void checkPremium() {
         TransactionDetails t3 = bp.getPurchaseTransactionDetails(PREMIUM_IDENTIFIER_3);
         int level;
         if (t3 != null) {
@@ -353,153 +347,8 @@ public class MainActivityFragment extends Fragment {
 
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         Log.d(TAG, "onActivityResult: " + requestCode);
-        if (requestCode == RESULT_FULL_RECREATE && resultCode == 1){
+        if (requestCode == RESULT_FULL_RECREATE && resultCode == 1) {
             fullRecreate();
-        }
-    }
-
-    ////////////////////////////////////////////////////////////////////////////////////////////////
-    /// Адаптер ////////////////////////////////////////////////////////////////////////////////////
-    ////////////////////////////////////////////////////////////////////////////////////////////////
-
-    public class QueriesCursorAdapter extends RecyclerView.Adapter<QueriesCursorAdapter.ViewHolder>{
-        public Context aContext;
-        private ArrayList<Query> mQuery;
-
-        public QueriesCursorAdapter(ArrayList<Query> queries, Context context) {
-            mQuery = queries;
-            aContext = context;
-            showEmpty(mQuery.size() == 0);
-        }
-
-        public void replaceQueries(ArrayList<Query> list) {
-            mQuery = list;
-            showEmpty(mQuery.size() == 0);
-        }
-
-        @Override
-        public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            Context context = parent.getContext();
-            LayoutInflater inflater = LayoutInflater.from(context);
-
-            return new ViewHolder(inflater.inflate(R.layout.list_item_query, parent, false));
-        }
-
-        @Override
-        public void onBindViewHolder(ViewHolder vHolder, int position) {
-            Query query = mQuery.get(position);
-
-            vHolder._id = query.getId();
-            vHolder.tvTitle.setText(query.getTitle());
-            vHolder.tvPeriod.setText(getPeriodText((int)query.getPeriod()));
-            vHolder.tvTime.setText(getTvTime(query));
-            vHolder.switchService.setChecked(query.isOn());
-
-            if (Methods.isDeveloper) {
-                vHolder.tvURI.setText(query.getURI().substring(8));
-                vHolder.tvLastId.setText(query.getLastId());
-                vHolder.tvServiceIsRun.setText(SearchIntentService.isServiceAlarmOn(aContext, vHolder._id) ? "true" : "false");
-                vHolder.tvLastDate.setText(query.getLastDate());
-                vHolder.tvLastShowedId.setText(query.getLastShowedId());
-            }
-        }
-
-        public class ViewHolder extends RecyclerView.ViewHolder {
-            public int _id;
-            public TextView tvTitle;
-            public TextView tvURI;
-            public TextView tvTime;
-            public TextView tvLastId;
-            public TextView tvPeriod;
-            public TextView tvServiceIsRun;
-            public Switch switchService;
-            public TextView tvLastDate;
-            public TextView tvLastShowedId;
-
-            public ViewHolder(final View itemView) {
-                super(itemView);
-                tvTitle = (TextView) itemView.findViewById(R.id.textView2);
-                tvURI = (TextView) itemView.findViewById(R.id.tvURI);
-                tvTime = (TextView) itemView.findViewById(R.id.tvTime);
-                tvLastId = (TextView) itemView.findViewById(R.id.textView8);
-                tvPeriod = (TextView) itemView.findViewById(R.id.tvPeriod);
-                tvServiceIsRun = (TextView) itemView.findViewById(R.id.textView5);
-                switchService = (Switch) itemView.findViewById(R.id.switchService);
-                tvLastDate = (TextView) itemView.findViewById(R.id.textView4);
-                tvLastShowedId = (TextView) itemView.findViewById(R.id.textView6);
-
-                itemView.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        Intent i = new Intent(getActivity(), CreateActivity.class);
-                        i.putExtra("ID", _id);
-                        startActivity(i);
-                    }
-                });
-
-                switchService.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-                    @Override
-                    public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                        Log.d("CheckedChangeListener", String.valueOf(_id) + " - " + b);
-                        Query query = queryLab.getQueryByID(_id);
-                        if ((getAdapterPosition() + 1) > mMethods.getAllowedSearches()){
-                            switchService.setChecked(false);
-                            SearchIntentService.setServiceAlarm(getActivity(), _id, false);
-                            query.setOn(false);
-                        }else{
-                            SearchIntentService.setServiceAlarm(getActivity(), _id, b);
-                            query.setOn(b);
-                        }
-                        queryLab.updateQuery(query);
-                    }
-                });
-
-                switchService.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        Methods.developerToast(getActivity(), "setOnClickListener");
-                        if ((getAdapterPosition() + 1) > mMethods.getAllowedSearches()){
-                            showDialog(DIALOG_BUY);
-                        }else{
-                            // Жесткий сброс поиска
-                            if (!((Switch) view).isChecked()){
-                                SearchIntentService.hardAlarmOff(getActivity(), _id);
-                            }
-                        }
-                    }
-                });
-
-                if (Methods.isDeveloper){
-                    tvTitle.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
-                            if (itemView.findViewById(R.id.linDeveloperInfo).getVisibility() == View.GONE) {
-                                itemView.findViewById(R.id.linDeveloperInfo).setVisibility(View.VISIBLE);
-                            }else{
-                                itemView.findViewById(R.id.linDeveloperInfo).setVisibility(View.GONE);
-                            }
-                        }
-                    });
-                }
-            }
-        }
-
-        @Override
-        public int getItemCount() {
-            return mQuery.size();
-        }
-
-        private String getPeriodText(int period){
-            int position = Arrays.binarySearch(mPeriodsValues, period);
-            return mPeriodsNames[position];
-        }
-
-        private String getTvTime(Query query){
-            if (query.isAround()){
-                return "Круглосуточно";
-            }else{
-                return "С " + query.getTimeFrom() + " до " + query.getTimeTo();
-            }
         }
     }
 }

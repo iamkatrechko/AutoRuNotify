@@ -8,6 +8,9 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.Toast;
 
+/**
+ * Дополнительные методы (утилита)
+ */
 public class Methods {
     public static final boolean isDeveloper = false;
 
