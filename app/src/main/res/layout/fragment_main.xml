@@ -8,7 +8,8 @@
         android:id="@+id/button_test"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Тестовое уведомление"
+        android:text="Тестовый поиск"
+        android:background="?attr/selectableItemBackground"
         />
 
     <android.support.v7.widget.RecyclerView

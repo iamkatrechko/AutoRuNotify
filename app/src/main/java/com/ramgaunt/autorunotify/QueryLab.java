@@ -126,8 +126,11 @@ public class QueryLab {
      */
     public Query getLast() {
         Cursor a = queryDatabase.getLast();
-        a.moveToFirst();
+        if (a.getCount() == 0) {
+            return null;
+        }
 
+        a.moveToFirst();
         return new Query(a);
     }
 }

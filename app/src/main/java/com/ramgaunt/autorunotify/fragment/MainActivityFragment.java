@@ -147,9 +147,14 @@ public class MainActivityFragment extends Fragment {
         v.findViewById(R.id.button_test).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent i = new Intent(getActivity(), SearchIntentService.class);
-                i.putExtra("ID", 1);
-                getActivity().startService(i);
+                Query lastQuery = queryLab.getLast();
+                if (lastQuery != null) {
+                    Intent i = new Intent(getActivity(), SearchIntentService.class);
+                    i.putExtra("ID", lastQuery.getId());
+                    getActivity().startService(i);
+                } else {
+                    Toast.makeText(getActivity(), "Необходимо создать хотя бы один поиск", Toast.LENGTH_SHORT).show();
+                }
             }
         });
         return v;
