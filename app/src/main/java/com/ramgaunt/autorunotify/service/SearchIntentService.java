@@ -2,61 +2,57 @@ package com.ramgaunt.autorunotify.service;
 
 import android.app.AlarmManager;
 import android.app.IntentService;
-import android.app.Notification;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Bitmap;
-import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Build;
-import android.os.Environment;
 import android.os.SystemClock;
 import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationManagerCompat;
-import android.support.v7.app.NotificationCompat;
 import android.util.Log;
 
 import com.ramgaunt.autorunotify.ArticleSearcher;
-import com.ramgaunt.autorunotify.DownloadManager;
 import com.ramgaunt.autorunotify.NotificationsManager;
 import com.ramgaunt.autorunotify.QueryLab;
-import com.ramgaunt.autorunotify.R;
 import com.ramgaunt.autorunotify.entity.Article;
 import com.ramgaunt.autorunotify.entity.Query;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.Calendar;
 
 public class SearchIntentService extends IntentService {
 
-    final static String TAG = "SearchIntentService";
+    /** Константа для логирования */
+    private static final String TAG = "SearchIntentService";
+    /** Константа для установки идентификатора последнего уведомления */
     public static final String ACTION_SET_LAST_ID = "setLastId";
+    /** Константа для открытия объявление в браузере */
     public static final String ACTION_OPEN_IN_BROWSER = "openInBrowser";
 
+    /** Время появления нового уведомления */
     private Calendar calendar;
+    /** Класс для работы с поисками в базе данных */
     private QueryLab queryLab;
+    /** Класс для нахождения новых объявлений */
     private ArticleSearcher mArticleSearcher;
-
+    /** Менеджер сохраненные на устройстве свойст и данных */
     private SharedPreferences prefs;
 
+    /** Менеджер уведомлений */
     private NotificationsManager mNotificationsManager;
 
     public SearchIntentService() {
         super("SearchIntentService");
-
     }
 
     @Override
     protected void onHandleIntent(Intent intent) {
-        //Log.d(TAG, "onHandleIntent----------------------------------------");
+        // Данный метод отрабатывает, когда "звенит" будильник, который просит сделать поиск новых объявлений
+        // Здесь происходит запрос на скачку всех объявлений конкретного поиска из базы данных
+        // Далее скачанный объявления проверяются на наличие новых и, в случая нахождения новых, отображает уведомление
 
         if (intent != null) {
             mNotificationsManager = new NotificationsManager(this);
@@ -71,7 +67,7 @@ public class SearchIntentService extends IntentService {
                     setLastId(intent);
                     return;
                 }
-                if (action.equals(ACTION_OPEN_IN_BROWSER)){
+                if (action.equals(ACTION_OPEN_IN_BROWSER)) {
                     setLastId(intent);
                     String queryURI = intent.getStringExtra("queryURI");
                     Intent i = new Intent(Intent.ACTION_VIEW, Uri.parse(queryURI));
@@ -88,42 +84,31 @@ public class SearchIntentService extends IntentService {
             setServiceAlarm(this, queryID, false);
             setServiceAlarm(this, queryID, query.isOn());
 
-            /*if (*//*queryID == 1 && *//*Methods.isDeveloper) {
-                int hour = calendar.get(Calendar.HOUR_OF_DAY);
-                int minute = calendar.get(Calendar.MINUTE);
-                int seconds = calendar.get(Calendar.SECOND);
-
-                try {
-                    String text = readNote(String.valueOf(queryID));
-                    saveNote(String.valueOf(queryID), text + "\n" + hour + ":" + minute + ":" + seconds);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                checkLimitsByLogFile(query);
-                *//*return;*//*
-            }*/
-
-            if (checkLimits(query)) return;
+            if (checkLimits(query)) {
+                return;
+            }
 
             //Log.d(TAG, "Новый поиск - " + query.getURI());
             Article article = mArticleSearcher.checkUpdate(this, query);
 
             if (article != null) {
-                //Log.d(TAG, "Появилось новое объявление");
+                Log.d(TAG, "Появилось новое объявление");
 
                 if (article.isCaptcha()) {
+                    // Если необходимо ввести капчу
                     mNotificationsManager.showCaptchaNotification();
                     return;
                 }
-                /*if (query.getLastShowedId().equals(article.getId())){
-                    //Log.d(TAG, "Данное объявление уже активно на экране");
+                /*if (query.getLastShowedId().equals(article.getId())) {
+                    // Если данное объявление уже отображалось, либо уже находится на экране
+                    Log.d(TAG, "Данное объявление уже активно на экране");
                 }else{
                     mNotificationsManager.showNotification(query, article);
                 }*/
 
                 mNotificationsManager.showNotification(query, article);
             } else {
-                //Log.d(TAG, "Новых объявлений нет");
+                Log.d(TAG, "Новых объявлений нет");
             }
         }
     }
@@ -132,7 +117,7 @@ public class SearchIntentService extends IntentService {
      * Работает ли устройство через Wi-Fi
      * @return true - да, false - нет
      */
-    private boolean isNetworkIsWifi(){
+    private boolean isNetworkIsWifi() {
         ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         return connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI).getState() == NetworkInfo.State.CONNECTED;
     }
@@ -144,19 +129,17 @@ public class SearchIntentService extends IntentService {
     private boolean isNetworkAvailableAndConnected() {
         ConnectivityManager cm =
                 (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
-        boolean isNetworkAvailable = cm.getActiveNetworkInfo() != null;
-        boolean isNetworkConnected = isNetworkAvailable &&
+        return cm.getActiveNetworkInfo() != null &&
                 cm.getActiveNetworkInfo().isConnected();
-        return isNetworkConnected;
     }
 
     /**
-     * Устанавливает отложенный запуск службы, или отключает ее
+     * Устанавливает отложенный запуск службы, или отключает его
      * @param context Контекст
      * @param queryId ID запроса
-     * @param isOn Включена/выключена служба
+     * @param isOn    Включена/выключена служба
      */
-    public static void setServiceAlarm(Context context, int queryId, boolean isOn){
+    public static void setServiceAlarm(Context context, int queryId, boolean isOn) {
         Intent i = new Intent(context, SearchIntentService.class);
         i.putExtra("ID", queryId);
 
@@ -164,23 +147,21 @@ public class SearchIntentService extends IntentService {
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 
         if (isOn) {
-            if (!isServiceAlarmOn(context, queryId)){
+            if (!isServiceAlarmOn(context, queryId)) {
                 Query query = QueryLab.get(context).getQueryByID(queryId);
 
                 pi = PendingIntent.getService(context, queryId, i, 0);
 
                 Log.d(TAG, "Запуск службы для ID: " + queryId);
-                /*alarmManager.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP,
-                        SystemClock.elapsedRealtime(), query.getPeriod(), pi);*/
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
                     alarmManager.setExact(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime() + query.getPeriod(), pi);
-                }else{
+                } else {
                     alarmManager.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime() + query.getPeriod(), pi);
                 }
             }
         } else {
-            if (isServiceAlarmOn(context, queryId)){
-                if (alarmManager != null){
+            if (isServiceAlarmOn(context, queryId)) {
+                if (alarmManager != null) {
                     Log.d(TAG, "Остановка службы для ID: " + queryId);
                     pi = PendingIntent.getService(context, queryId, i, 0);
                     alarmManager.cancel(pi);
@@ -190,7 +171,12 @@ public class SearchIntentService extends IntentService {
         }
     }
 
-    public static void hardAlarmOff(Context context, int queryId){
+    /**
+     * Отключает постоянную проверку для определенного поиска
+     * @param context контекст
+     * @param queryId идентификатор отключаемого поиска
+     */
+    public static void hardAlarmOff(Context context, int queryId) {
         Intent i = new Intent(context, SearchIntentService.class);
         i.putExtra("ID", queryId);
 
@@ -205,7 +191,7 @@ public class SearchIntentService extends IntentService {
     /**
      * Проверяет, включен ли отложенный запуск службы
      * @param context Контекст
-     * @param Id ID запроса
+     * @param Id      ID запроса
      * @return Включен ли запуск
      */
     public static boolean isServiceAlarmOn(Context context, int Id) {
@@ -215,13 +201,17 @@ public class SearchIntentService extends IntentService {
         return pi != null;
     }
 
-    private void setLastId(Intent intent){
+    /**
+     * Сохраняет последнее найденное объявление, чтобы не отображать его в следующий раз
+     * @param intent интент, присланный уведомлением после нажатия на кнопка "Отметить как "прочитанное""
+     */
+    private void setLastId(Intent intent) {
         int queryId = intent.getIntExtra("queryId", -1);
         String articleId = intent.getStringExtra("articleId");
         String articleLastDate = intent.getStringExtra("lastDate");
 
         Query query = queryLab.getQueryByID(queryId);
-        if (query == null){
+        if (query == null) {
             return;
         }
         query.setLastId(articleId);
@@ -230,151 +220,29 @@ public class SearchIntentService extends IntentService {
 
         NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
         notificationManager.cancel(queryId);
-        //Log.d(TAG, "Установлено последнее время и ID: " + articleId + " для " + queryId);
     }
 
-    private boolean checkLimits(Query query){
+    /**
+     * Проверяет возможность нахождение объявлений через интернет
+     * @param query запрос на поиск объявлений
+     * @return {@code true} - все нормально, можно искать, {@code false} - поиск следует остановить
+     */
+    private boolean checkLimits(Query query) {
         if (!isNetworkAvailableAndConnected()) {
             //Log.d(TAG, "Отмена поиска: нет сети");
             return true;
         }
 
         boolean onlyWifi = prefs.getBoolean("only_wifi", false);
-        if (onlyWifi && !isNetworkIsWifi()){
+        if (onlyWifi && !isNetworkIsWifi()) {
             //Log.d(TAG, "Отмена поиска: нет подключения к Wi-Fi");
             return true;
         }
+
         if (!query.isTime(calendar)) {
             //Log.d(TAG, "Отмена поиска: текущее время не входит во время работы данного поиска");
             return true;
         }
         return false;
-    }
-
-    ////////////////////////////////////////////////////////////////////////////////////////////////
-    // Удалить /////////////////////////////////////////////////////////////////////////////////////
-    ////////////////////////////////////////////////////////////////////////////////////////////////
-
-    private void showTestNotification(){
-        mArticleSearcher = new ArticleSearcher();
-        DownloadManager downloadManager = new DownloadManager();
-        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
-
-        Bitmap bitmap1 = downloadManager.getUrlBitmap("https://38.img.avito.st/140x105/2968702838.jpg");
-        Bitmap bitmap2 = downloadManager.getUrlBitmap("https://44.img.avito.st/140x105/2974080744.jpg");
-
-        Notification notification1 = new NotificationCompat.Builder(this)
-                .setSmallIcon(R.drawable.ic_result)
-                .setLargeIcon(bitmap1)
-                .setColor(Color.parseColor("#1f89de"))
-                .setContentTitle("Продам Nexus 5x на 32gb (в идеале)")
-                .setContentText("12 500 руб., сегодня 6:29")
-                .setSubText("Nexus 5x (новых: 4)")
-                .addAction(new android.support.v4.app.NotificationCompat.Action(0, "Отметить как \"Прочитано\"", null))
-                .build();
-
-        Notification notification2 = new NotificationCompat.Builder(this)
-                .setSmallIcon(R.drawable.ic_result)
-                .setLargeIcon(bitmap2)
-                .setColor(Color.parseColor("#1f89de"))
-                .setContentTitle("3-к квартира, 60 м², 9/16 эт.")
-                .setContentText("11 600 000 руб., сегодня 6:13")
-                .setSubText("Квартира на ВДНХ (новых: 13)")
-                .addAction(new android.support.v4.app.NotificationCompat.Action(0, "Отметить как \"Прочитано\"", null))
-                .build();
-
-        notificationManager.notify(1, notification1);
-        notificationManager.notify(2, notification2);
-    }
-
-    private boolean checkLimitsByLogFile(Query query){
-        if (!isNetworkAvailableAndConnected()) {
-            try {
-                String text = readNote("");
-                saveNote("", text + "Отмена поиска: нет сети");
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            return true;
-        }
-        boolean onlyWifi = prefs.getBoolean("only_wifi", false);
-        if (onlyWifi && !isNetworkIsWifi()){
-            try {
-                String text = readNote("");
-                saveNote("", text + "Отмена поиска: нет подключения к Wi-Fi");
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            return true;
-        }
-        if (!query.isTime(calendar)) {
-            try {
-                String text = readNote("");
-                saveNote("", text + "Отмена поиска: текущее время не входит во время работы данного поиска");
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            return true;
-        }
-        return false;
-    }
-
-    public void saveNote (String fileName, String text) throws IOException {
-        String fN = "avito_log_file.txt";
-
-        if (!Environment.getExternalStorageState().equals(
-                Environment.MEDIA_MOUNTED)) {
-            Log.d(TAG, "SD-карта не доступна: " + Environment.getExternalStorageState());
-            return;
-        }
-        // получаем путь к SD
-        File sdPath = Environment.getExternalStorageDirectory();
-        // добавляем свой каталог к пути
-        sdPath = new File(sdPath.getAbsolutePath() + "/"+ "");
-        // формируем объект File, который содержит путь к файлу
-        File sdFile = new File(sdPath, fN);
-
-        try {
-            FileWriter f = new FileWriter(sdFile);
-            f.write(text);
-            // закрываем поток
-            f.close();
-            Log.d(TAG, "Файл записан на SD: " + sdFile.getAbsolutePath());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public String readNote (String fileName) throws IOException {
-
-        String fN = "avito_log_file.txt";
-
-        if (!Environment.getExternalStorageState().equals(
-                Environment.MEDIA_MOUNTED)) {
-            Log.d(TAG, "SD-карта не доступна: " + Environment.getExternalStorageState());
-            return "Errorrr";
-        }
-        // получаем путь к SD
-        File sdPath = Environment.getExternalStorageDirectory();
-        // добавляем свой каталог к пути
-        sdPath = new File(sdPath.getAbsolutePath() + "/"+ "");
-        // формируем объект File, который содержит путь к файлу
-        File sdFile = new File(sdPath, fN);
-
-        try {
-            FileReader f = new FileReader(sdFile);
-            BufferedReader br = new BufferedReader(f);
-            String ss = "";
-            String str;
-            while ((str = br.readLine()) != null) {
-                ss = ss + (!ss.equals("") ? "\n" : "") + str;
-            }
-            f.close();
-            return ss;
-            // закрываем поток
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return "Errorrrrrrrrr";
     }
 }

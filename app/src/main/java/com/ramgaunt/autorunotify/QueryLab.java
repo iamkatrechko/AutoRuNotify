@@ -9,12 +9,22 @@ import com.ramgaunt.autorunotify.service.SearchIntentService;
 
 import java.util.ArrayList;
 
+/** Класс для работы с поисками в базе данных */
 public class QueryLab {
+
+    /** Статический экземпляр текущего класса */
     private static QueryLab sQueryLab;
+    /** Список всех поисков */
     private ArrayList<Query> mQueries;
+    /** Контекст */
     private Context mContext;
+    /** База данных со всеми поисками */
     private QueryDatabase queryDatabase;
 
+    /**
+     * Конструктор
+     * @param context контекст
+     */
     private QueryLab(Context context) {
         mContext = context.getApplicationContext();
         queryDatabase = new QueryDatabase(context);
@@ -27,17 +37,26 @@ public class QueryLab {
         }
     }
 
-    public static QueryLab get(Context context){
-        if (sQueryLab == null){
+    /**
+     * Возвращает экземпляр класса-синглтона
+     * @param context контекст
+     * @return экземпляр класса-синглтона
+     */
+    public static QueryLab get(Context context) {
+        if (sQueryLab == null) {
             sQueryLab = new QueryLab(context);
         }
         return sQueryLab;
     }
 
-    public ArrayList<Query> getAll(){
+    /**
+     * Возвращает список всех поисков
+     * @return список всех поисков
+     */
+    public ArrayList<Query> getAll() {
         Cursor cursor = queryDatabase.getAll();
         mQueries = new ArrayList<>();
-        for (int i = 0; i < cursor.getCount(); i++){
+        for (int i = 0; i < cursor.getCount(); i++) {
             cursor.moveToPosition(i);
             mQueries.add(new Query(cursor));
         }
@@ -45,61 +64,70 @@ public class QueryLab {
         return mQueries;
     }
 
+    /**
+     * Возвращает список всех поисков без чтения из базы данных
+     * @return список всех поисков без чтения из базы данных
+     */
     public ArrayList<Query> getQueries() {
         return mQueries;
     }
 
+    /**
+     * Возвращает поиск по его идентификатору
+     * @param id идентификатор искомого поиска
+     * @return сущность поиска
+     */
     public Query getQueryByID(int id) {
         Cursor cursor = queryDatabase.getByID(id);
         cursor.moveToFirst();
 
         try {
             return new Query(cursor);
-        }catch (Exception e){
+        } catch (Exception e) {
             return null;
         }
     }
 
-    public void addQuery(Query q){
-        queryDatabase.addQuery(q);
+    /**
+     * Добавляет новый поиск в базу данных
+     * @param query новый поиск
+     */
+    public void addQuery(Query query) {
+        queryDatabase.addQuery(query);
         refresh();
     }
 
+    /**
+     * Обновляет параметры поиска в базе данных
+     * @param q обновленный поиск
+     */
     public void updateQuery(Query q) {
         queryDatabase.updateQuery(q);
     }
 
-    public void deleteById(int ID){
+    /**
+     * Удаляет поиск по его идентификатору
+     * @param ID идентификатор искомого поиска
+     */
+    public void deleteById(int ID) {
         queryDatabase.deleteById(ID);
         SearchIntentService.hardAlarmOff(mContext, ID);
     }
 
-    public void refresh(){
+    /** Обновляет список поисков по базе данных */
+    public void refresh() {
         mQueries = new ArrayList<>();
         queryDatabase.getAll();
     }
 
-    public void generate(int count){
-        for (int i = 0; i < count; i++){
-            Query q = new Query();
-            q.setTitle("Название " + i);
-            q.setURI("https://m.avito.ru/rossiya");
-            queryDatabase.addQuery(q);
-        }
-    }
-
-    public int getCount(){
-        return mQueries.size();
-    }
-
-    public Query getLast(){
+    /**
+     * Возвращает последний поиск из списка
+     * @return последний поиск из списка
+     */
+    public Query getLast() {
         Cursor a = queryDatabase.getLast();
         a.moveToFirst();
 
         return new Query(a);
-    }
-
-    public void deletePreviously(int Id){
-
     }
 }

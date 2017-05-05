@@ -173,7 +173,7 @@ public class TestActivityFragment extends Fragment implements BillingProcessor.I
         v.findViewById(R.id.button19).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                mQueryLab.generate(20);
+                //mQueryLab.generate(20);
             }
         });
 

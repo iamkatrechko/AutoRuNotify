@@ -4,22 +4,37 @@ import android.database.Cursor;
 import android.util.Log;
 
 import java.util.Calendar;
-import java.util.Date;
 
+/**
+ * Класс-сущность поиска с определенными настройками
+ */
 public class Query {
+
+    /** Идентификатор поиска */
     private int mId;
+    /** Название поиска */
     private String mTitle;
+    /** Ссылка на поиск (его настройки) */
     private String mUri;
+    /** Идентификатор последнего найденного объявления этого поиска */
     private String mLastId;
+    /** Включен ли поиск */
     private boolean mOn;
+    /** Период автоматического запуска поиска */
     private int mPeriod;
+    /** Необходимость соблюдать временной режим (например: до полуночи) */
     private boolean mAround;
+    /** Начало временного режима */
     private String mTimeFrom;
+    /** Конец временного режима */
     private String mTimeTo;
+    /** Дата последнего найденного объявления */
     private String mLastDate;
+    /** Дата последнего отображенного объявления */
     private String mLastShowedId;
 
-    public Query(){
+    /** Конструктор */
+    public Query() {
         setId(-1);
         setTitle("");
         setOn(true);
@@ -33,7 +48,11 @@ public class Query {
         setLastShowedId("-1");
     }
 
-    public Query(Cursor cursor){
+    /**
+     * Конструктор
+     * @param cursor курсор с поиском из базы данных
+     */
+    public Query(Cursor cursor) {
         setId(cursor.getInt(0));
         setTitle(cursor.getString(1));
         setLastId(cursor.getString(2));
@@ -47,7 +66,11 @@ public class Query {
         setLastShowedId(cursor.getString(10));
     }
 
-    public int getId(){
+    /**
+     * Возвращает идентификатор поиска
+     * @return идентификатор поиска
+     */
+    public int getId() {
         return mId;
     }
 
@@ -55,14 +78,22 @@ public class Query {
         mId = id;
     }
 
+    /**
+     * Возвращает название поиска
+     * @return название поиска
+     */
     public String getTitle() {
         return mTitle;
     }
 
-    public void setTitle(String title){
+    public void setTitle(String title) {
         mTitle = title;
     }
 
+    /**
+     * Возвращает настройки поиска
+     * @return настройки поиска
+     */
     public String getURI() {
         return mUri;
     }
@@ -71,14 +102,22 @@ public class Query {
         mUri = URI;
     }
 
-    public boolean isOn(){
+    /**
+     * Включен ли поиск
+     * @return включен ли поиск
+     */
+    public boolean isOn() {
         return mOn;
     }
 
-    public void setOn(Boolean isOn){
+    public void setOn(Boolean isOn) {
         this.mOn = isOn;
     }
 
+    /**
+     * Возвращает идентификатор последнего найденного объявления поиска
+     * @return идентификатор последнего найденного объявления
+     */
     public String getLastId() {
         return mLastId;
     }
@@ -87,25 +126,33 @@ public class Query {
         this.mLastId = mLastId;
     }
 
+    /**
+     * Возвращает период автозапуска поиска
+     * @return период автозапуска поиска
+     */
     public long getPeriod() {
         return mPeriod;
     }
 
     /**
      * Устанавливает период автопоиска
-     * @param period Период в мс
+     * @param period период в мс
      * @return true - если период был изменен
      */
     public boolean setPeriod(int period) {
-        if (mPeriod != period){
+        if (mPeriod != period) {
             mPeriod = period;
             return true;
-        }else{
+        } else {
             mPeriod = period;
             return false;
         }
     }
 
+    /**
+     * Возвращает необходимость соблюдения временного режима
+     * @return необходимость соблюдения временного режима
+     */
     public boolean isAround() {
         return mAround;
     }
@@ -114,6 +161,10 @@ public class Query {
         mAround = around;
     }
 
+    /**
+     * Возвращает начальное время режима
+     * @return начальное время режима
+     */
     public String getTimeFrom() {
         return mTimeFrom;
     }
@@ -122,6 +173,10 @@ public class Query {
         mTimeFrom = timeFrom;
     }
 
+    /**
+     * Возвращает конечное время режима
+     * @return конечное время режима
+     */
     public String getTimeTo() {
         return mTimeTo;
     }
@@ -130,6 +185,10 @@ public class Query {
         mTimeTo = timeTo;
     }
 
+    /**
+     * Возвращает дату последнего найденного объявления
+     * @return дата последнего найденного объявления
+     */
     public String getLastDate() {
         return mLastDate;
     }
@@ -138,6 +197,10 @@ public class Query {
         mLastDate = lastDate;
     }
 
+    /**
+     * Возвращает дату последнего отображенного объявления
+     * @return дата последнего отображенного объявления
+     */
     public String getLastShowedId() {
         return mLastShowedId;
     }
@@ -150,7 +213,7 @@ public class Query {
      * Проверяет, входит ли текукщее время в настроенное время работы автопоиска
      * @return true - проводить поиск, false - отмена поиска
      */
-    public boolean isTime(Calendar calendar){
+    public boolean isTime(Calendar calendar) {
         int hour = calendar.get(Calendar.HOUR_OF_DAY);
         int minute = calendar.get(Calendar.MINUTE);
         return isTime(hour, minute);
@@ -161,9 +224,9 @@ public class Query {
      * @return true - проводить поиск, false - отмена поиска
      */
     public boolean isTime(int hourNow, int minuteNow) {
-        if (isAround()){
+        if (isAround()) {
             return true;
-        }else{
+        } else {
             int hourFrom = Integer.valueOf(getTimeFrom().split("\\:")[0]);
             int minuteFrom = Integer.valueOf(getTimeFrom().split("\\:")[1]);
             int hourTo = Integer.valueOf(getTimeTo().split("\\:")[0]);
@@ -173,9 +236,9 @@ public class Query {
             int tFrom = hourFrom * 60 + minuteFrom;
             int tTo = hourTo * 60 + minuteTo;
 
-            if (tFrom < tTo){
+            if (tFrom < tTo) {
                 return tNow > tFrom && tNow < tTo;
-            }else{
+            } else {
                 return tNow < tFrom || tNow > tTo;
             }
         }
@@ -205,7 +268,7 @@ public class Query {
      * @param date Дата в формате "01.01.2001-00:00"
      * @return Дата в виде {@link Calendar}
      */
-    private Calendar getCalendarFromString(String date){
+    private Calendar getCalendarFromString(String date) {
         String[] sss = date.split("\\-|\\.|\\:");
         int year = Integer.valueOf(sss[0]);
         int month = Integer.valueOf(sss[1]);

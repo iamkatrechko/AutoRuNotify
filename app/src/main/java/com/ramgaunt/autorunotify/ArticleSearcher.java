@@ -10,6 +10,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Класс для нахождения новых объявлений
+ */
 public class ArticleSearcher {
 
     private static final String TAG = ArticleSearcher.class.getSimpleName();
@@ -50,7 +53,7 @@ public class ArticleSearcher {
                 }
 
                 Article article = new Article(articleHTML);
-                if (article.isVIP() == 0) {
+                if (article.isVip() == 0) {
                     //Если это первый поиск
                     if (query.getLastId().equals("-1")) {
                         article.setUnreadCount(0);
@@ -91,7 +94,7 @@ public class ArticleSearcher {
         }
 
         for (Article article : getAllArticles(result)) {
-            if (article.isVIP()) {
+            if (article.isVip()) {
                 // Если объявление оплаченное, не рассматриваем его
                 continue;
             }

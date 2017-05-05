@@ -45,7 +45,7 @@ public class NotificationsManager {
 
 
         DownloadManager downloadManager = new DownloadManager();
-        Bitmap bitmap = downloadManager.getUrlBitmap(article.getImgUrl());
+        Bitmap bitmap = downloadManager.getUrlBitmap(mContext, article.getImgUrl());
 
         String ringtone = mPreferenceManager.getString("notifications_new_message_ringtone", "");
         boolean vibration = mPreferenceManager.getBoolean("notifications_new_message", true);
@@ -131,4 +131,35 @@ public class NotificationsManager {
         notificationManager.notify(777, notification);
     }
 
+    /** Отображает тестовое уведомление с поготовленными данными */
+    private void showTestNotification(){
+        DownloadManager downloadManager = new DownloadManager();
+        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(mContext);
+
+        Bitmap bitmap1 = downloadManager.getUrlBitmap(mContext, "https://38.img.avito.st/140x105/2968702838.jpg");
+        Bitmap bitmap2 = downloadManager.getUrlBitmap(mContext, "https://44.img.avito.st/140x105/2974080744.jpg");
+
+        Notification notification1 = new NotificationCompat.Builder(mContext)
+                .setSmallIcon(R.drawable.ic_result)
+                .setLargeIcon(bitmap1)
+                .setColor(Color.parseColor("#1f89de"))
+                .setContentTitle("Продам Nexus 5x на 32gb (в идеале)")
+                .setContentText("12 500 руб., сегодня 6:29")
+                .setSubText("Nexus 5x (новых: 4)")
+                .addAction(new android.support.v4.app.NotificationCompat.Action(0, "Отметить как \"Прочитано\"", null))
+                .build();
+
+        Notification notification2 = new NotificationCompat.Builder(mContext)
+                .setSmallIcon(R.drawable.ic_result)
+                .setLargeIcon(bitmap2)
+                .setColor(Color.parseColor("#1f89de"))
+                .setContentTitle("3-к квартира, 60 м², 9/16 эт.")
+                .setContentText("11 600 000 руб., сегодня 6:13")
+                .setSubText("Квартира на ВДНХ (новых: 13)")
+                .addAction(new android.support.v4.app.NotificationCompat.Action(0, "Отметить как \"Прочитано\"", null))
+                .build();
+
+        notificationManager.notify(1, notification1);
+        notificationManager.notify(2, notification2);
+    }
 }

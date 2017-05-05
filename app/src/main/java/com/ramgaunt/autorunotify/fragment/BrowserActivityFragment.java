@@ -2,14 +2,12 @@ package com.ramgaunt.autorunotify.fragment;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.os.Build;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -21,15 +19,28 @@ import com.ramgaunt.autorunotify.R;
 
 import java.util.ArrayList;
 
+/**
+ * Фрагмент для отображения окна браузера с настройками поиска
+ */
 public class BrowserActivityFragment extends Fragment {
-    private static String TAG = "BrowserActivityFragment";
 
+    /** Тэг для логов */
+    private static final String TAG = "BrowserActivityFragment";
+
+    /** Текущая ссылка с настройками */
     private String currentURI;
-
+    /** Виджет браузера для отображения страницы с настройками */
     private WebView mWebView;
+    /** Окно с информацией о загрузке */
     private LinearLayout linEmpty;
+    /** Индикатор прогресса */
     private ProgressBar mProgressBar;
 
+    /**
+     * Возвращает новый экземпляр фрагмента
+     * @param uri ссылка с настройками
+     * @return
+     */
     public static BrowserActivityFragment newInstance(String uri) {
         BrowserActivityFragment fragment = new BrowserActivityFragment();
 
@@ -44,7 +55,6 @@ public class BrowserActivityFragment extends Fragment {
                              Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_browser, container, false);
 
-
         currentURI = getArguments().getString("URI");
 
         mWebView = (WebView) v.findViewById(R.id.webView);
@@ -56,7 +66,6 @@ public class BrowserActivityFragment extends Fragment {
                 showWebView(true);
             }
         });
-
 
         mProgressBar.setMax(100); // Значения в диапазоне 0-100
         mWebView.getSettings().setJavaScriptEnabled(true);

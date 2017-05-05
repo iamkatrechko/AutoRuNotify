@@ -1,7 +1,5 @@
 package com.ramgaunt.autorunotify.entity;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -97,7 +95,7 @@ public class Article {
         mDate = date;
     }
 
-    public boolean isVIP() {
+    public boolean isVip() {
         return mVip;
     }
 
@@ -121,6 +119,11 @@ public class Article {
         mImgUrl = imgUrl;
     }
 
+    /**
+     * Парсит идентификатор объявления
+     * @param HTMLtext исходная HTML-строка объявления
+     * @return идентификатор объявления
+     */
     private String parseID(String HTMLtext) {
         Matcher m = patternId.matcher(HTMLtext);
         if (m.find()) {
@@ -130,6 +133,11 @@ public class Article {
         }
     }
 
+    /**
+     * Парсит заголовок объявления
+     * @param HTMLtext исходная HTML-строка объявления
+     * @return заголовок объявления
+     */
     private String parseTitle(String HTMLtext) {
         Matcher m = patternTitle.matcher(HTMLtext);
         if (m.find()) {
@@ -139,6 +147,11 @@ public class Article {
         }
     }
 
+    /**
+     * Парсит цену объявления
+     * @param HTMLtext исходная HTML-строка объявления
+     * @return цену объявления
+     */
     private String parsePrice(String HTMLtext) {
         Matcher m = patternPrice.matcher(HTMLtext);
         if (m.find()) {
@@ -148,6 +161,11 @@ public class Article {
         }
     }
 
+    /**
+     * Парсит дату объявления
+     * @param HTMLtext исходная HTML-строка объявления
+     * @return дату объявления
+     */
     private String parseDate(String HTMLtext) {
         Matcher m = patternDate.matcher(HTMLtext);
         if (m.find()) {
@@ -157,6 +175,11 @@ public class Article {
         }
     }
 
+    /**
+     * Парсит вип-признак объявления
+     * @param HTMLtext исходная HTML-строка объявления
+     * @return вип-признак объявления
+     */
     private boolean parseVIP(String HTMLtext) {
         Matcher m = patternVip.matcher(HTMLtext);
         if (m.find()) {
@@ -166,6 +189,11 @@ public class Article {
         }
     }
 
+    /**
+     * Парсит ссылку на изображение объявления
+     * @param HTMLtext исходная HTML-строка объявления
+     * @return ссылку на изображение объявления
+     */
     private String parseImgUrl(String HTMLtext) {
         Matcher m = patternImgUrl.matcher(HTMLtext);
         if (m.find()) {
@@ -177,13 +205,19 @@ public class Article {
 
     /**
      * Преобразует дату из {@link Calendar} в строку
-     * @param calendar Экземпляр даты
-     * @return Дата в формате "01.01.2001-00:00"
+     * @param calendar экземпляр даты
+     * @return дата в формате "01.01.2001-00:00"
      */
     public String getDateCalendar(Calendar calendar) {
         int hour, minute, day, month, year;
 
-        try {
+        hour = calendar.get(Calendar.HOUR_OF_DAY);
+        minute = calendar.get(Calendar.MINUTE);
+        day = calendar.get(Calendar.DAY_OF_MONTH);
+        month = calendar.get(Calendar.MONTH);
+        year = calendar.get(Calendar.YEAR);
+
+        /*try {
             String articleDate = getDate();
             if (articleDate.contains("Сегодня")) {
                 day = calendar.get(Calendar.DAY_OF_MONTH);
@@ -207,7 +241,7 @@ public class Article {
         } catch (Exception e) {
             e.printStackTrace();
             return "";
-        }
+        }*/
 
         return "" + day + "." + month + "." + year + "-" + hour + ":" + minute;
     }

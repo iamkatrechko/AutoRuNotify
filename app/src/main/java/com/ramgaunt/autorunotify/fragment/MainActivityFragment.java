@@ -126,7 +126,7 @@ public class MainActivityFragment extends Fragment {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (queryLab.getCount() >= mMethods.getAllowedSearches()){
+                if (queryLab.getQueries().size() >= mMethods.getAllowedSearches()){
                     showDialog(DIALOG_BUY);
                 }else{
                     Intent i = new Intent(getActivity(), CreateActivity.class);
@@ -298,8 +298,8 @@ public class MainActivityFragment extends Fragment {
      * Проверяет на наличие недопустимых поисков и выключает их, перезаписывая базу
      */
     private void checkAndBlock() {
-        if (queryLab.getCount() > mMethods.getAllowedSearches()){
-            Log.d(TAG, "Количество поисков больше допустимого: " + queryLab.getCount() + ">" + mMethods.getAllowedSearches());
+        if (queryLab.getQueries().size() > mMethods.getAllowedSearches()){
+            Log.d(TAG, "Количество поисков больше допустимого: " + queryLab.getQueries().size() + ">" + mMethods.getAllowedSearches());
             ArrayList<Query> queries = queryLab.getQueries();
 
             for (int i = 1; i <= queries.size(); i++){
