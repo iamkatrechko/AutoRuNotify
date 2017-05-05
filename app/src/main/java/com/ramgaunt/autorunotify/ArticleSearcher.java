@@ -87,7 +87,7 @@ public class ArticleSearcher {
         }*/
 
         if (result.contains("Ой!")) {
-            return new Article("Капча", false);
+            return new Article(true);
         }
 
         for (Article article : getAllArticles(result)) {
@@ -97,6 +97,7 @@ public class ArticleSearcher {
             }
 
             /*if (article.getId().equals(query.getLastId())) {
+                // Если первое отображаемое объявление равно ранее сохраненному -> новых нет
                 return null;
             }*/
 

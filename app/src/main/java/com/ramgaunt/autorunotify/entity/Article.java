@@ -13,7 +13,7 @@ import java.util.regex.Pattern;
 public class Article {
 
     /** Список месяцев для отображения даты обявления */
-    private String[] months = {"января", "февраля", "марта", "апреля", "мая", "июня",
+    private static final String[] MONTHS = {"января", "февраля", "марта", "апреля", "мая", "июня",
             "июля", "августа", "сентября", "октября", "ноября", "декабря"};
 
     /** Идентификатор объявления */
@@ -28,8 +28,8 @@ public class Article {
     private boolean mVip;
     /** URL главного изображение объявления */
     private String mImgUrl;
-    /** Количество непрочтенных объявлений */
-    private int mUnreadCount;
+    /** Флаг того, необходимо ли ввести капчу */
+    private boolean mCaptcha;
 
     /** Паттерн для поиска идентификатора */
     private static final Pattern patternId = Pattern.compile("\"saleId\":\"(.*?)\"");
@@ -44,8 +44,12 @@ public class Article {
     /** Паттерн для поиска URL изображения */
     private static final Pattern patternImgUrl = Pattern.compile("\"cover\":\"(.*?)\"");
 
-    public Article(String s, boolean s2) {
-        mTitle = s;
+    /**
+     * Конструктор, использующийся для передачи флага необходимости ввода капчи
+     * @param captcha флаг необходимости ввода капчи
+     */
+    public Article(boolean captcha) {
+        mCaptcha = captcha;
     }
 
     /**
@@ -53,7 +57,6 @@ public class Article {
      * @param HTMLtext исходный HTML-текст одного объявления
      */
     public Article(String HTMLtext) {
-        mUnreadCount = 1;
         setId(parseID(HTMLtext));
         setTitle(parseTitle(HTMLtext));
         setPrice(parsePrice(HTMLtext));
@@ -79,7 +82,7 @@ public class Article {
     }
 
     public String getPrice() {
-        return mPrice;
+        return mPrice + " руб.";
     }
 
     public void setPrice(String price) {
@@ -110,37 +113,12 @@ public class Article {
         }
     }
 
+    public boolean isCaptcha() {
+        return mCaptcha;
+    }
+
     public void setImgUrl(String imgUrl) {
         mImgUrl = imgUrl;
-    }
-
-    /**
-     * Возвращает число непрочитанных объявлений
-     * @return Число непрочитанных объявлений
-     */
-    public int getUnreadCount() {
-        return mUnreadCount;
-    }
-
-    /**
-     * Возвращает количество непрочитанных объявлений в конечном виде
-     * @return Строка с информацией о кол-ве непрочитанных объявлений
-     */
-    public String getUnreadCountString() {
-        String newCount;
-        if (getUnreadCount() > 19) {
-            newCount = " (новых: 20+)";
-        } else if (getUnreadCount() == 0) {
-            newCount = "";
-        } else {
-            newCount = " (новых: " + getUnreadCount() + ")";
-        }
-
-        return newCount;
-    }
-
-    public void setUnreadCount(int unreadCount) {
-        mUnreadCount = unreadCount;
     }
 
     private String parseID(String HTMLtext) {
@@ -198,13 +176,6 @@ public class Article {
     }
 
     /**
-     * Инкрементирует количество новых объявлений для данного экземпляра
-     */
-    public void incrementUnreadCount() {
-        mUnreadCount++;
-    }
-
-    /**
      * Преобразует дату из {@link Calendar} в строку
      * @param calendar Экземпляр даты
      * @return Дата в формате "01.01.2001-00:00"
@@ -225,7 +196,7 @@ public class Article {
                 String date = articleDate.substring(0, articleDate.indexOf(","));
                 String[] date2 = date.split("\\s+");
                 day = Integer.valueOf(date2[0]);
-                ArrayList<String> m = new ArrayList<>(Arrays.asList(months));
+                ArrayList<String> m = new ArrayList<>(Arrays.asList(MONTHS));
                 month = m.indexOf(date2[1]) + 1;
             }
 

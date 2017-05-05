@@ -22,9 +22,9 @@ import android.util.Log;
 
 import com.ramgaunt.autorunotify.ArticleSearcher;
 import com.ramgaunt.autorunotify.DownloadManager;
+import com.ramgaunt.autorunotify.NotificationsManager;
 import com.ramgaunt.autorunotify.QueryLab;
 import com.ramgaunt.autorunotify.R;
-import com.ramgaunt.autorunotify.activity.EnterCaptchaActivity;
 import com.ramgaunt.autorunotify.entity.Article;
 import com.ramgaunt.autorunotify.entity.Query;
 
@@ -36,9 +36,10 @@ import java.io.IOException;
 import java.util.Calendar;
 
 public class SearchIntentService extends IntentService {
+
     final static String TAG = "SearchIntentService";
-    private final static String ACTION_SET_LAST_ID = "setLastId";
-    private final static String ACTION_OPEN_IN_BROWSER = "openInBrowser";
+    public static final String ACTION_SET_LAST_ID = "setLastId";
+    public static final String ACTION_OPEN_IN_BROWSER = "openInBrowser";
 
     private Calendar calendar;
     private QueryLab queryLab;
@@ -46,8 +47,11 @@ public class SearchIntentService extends IntentService {
 
     private SharedPreferences prefs;
 
+    private NotificationsManager mNotificationsManager;
+
     public SearchIntentService() {
         super("SearchIntentService");
+
     }
 
     @Override
@@ -55,10 +59,11 @@ public class SearchIntentService extends IntentService {
         //Log.d(TAG, "onHandleIntent----------------------------------------");
 
         if (intent != null) {
-            calendar = Calendar.getInstance();
-            queryLab = QueryLab.get(this);
-            mArticleSearcher = new ArticleSearcher();
+            mNotificationsManager = new NotificationsManager(this);
             prefs = PreferenceManager.getDefaultSharedPreferences(this);
+            mArticleSearcher = new ArticleSearcher();
+            queryLab = QueryLab.get(this);
+            calendar = Calendar.getInstance();
 
             String action = intent.getAction();
             if (action != null) {
@@ -106,16 +111,17 @@ public class SearchIntentService extends IntentService {
             if (article != null) {
                 //Log.d(TAG, "Появилось новое объявление");
 
+                if (article.isCaptcha()) {
+                    mNotificationsManager.showCaptchaNotification();
+                    return;
+                }
                 /*if (query.getLastShowedId().equals(article.getId())){
                     //Log.d(TAG, "Данное объявление уже активно на экране");
                 }else{
-                    showNotification(query, article);
+                    mNotificationsManager.showNotification(query, article);
                 }*/
-                if (article.getTitle().equals("Капча")) {
-                    showCaptchaNotification();
-                    return;
-                }
-                showNotification(query, article);
+
+                mNotificationsManager.showNotification(query, article);
             } else {
                 //Log.d(TAG, "Новых объявлений нет");
             }
@@ -207,99 +213,6 @@ public class SearchIntentService extends IntentService {
         PendingIntent pi = PendingIntent
                 .getService(context, Id, i, PendingIntent.FLAG_NO_CREATE);
         return pi != null;
-    }
-
-    /**
-     * Выводит уведомление
-     * @param query Запрос
-     * @param article Объявление
-     */
-    private void showNotification(Query query, Article article) {
-        DownloadManager downloadManager = new DownloadManager();
-        Bitmap bitmap = downloadManager.getUrlBitmap(article.getImgUrl());
-
-        String ringtone = prefs.getString("notifications_new_message_ringtone", "");
-        boolean vibration = prefs.getBoolean("notifications_new_message", true);
-
-        int defaults;
-        if (vibration) {
-            defaults = Notification.DEFAULT_VIBRATE | Notification.DEFAULT_LIGHTS;
-        } else {
-            defaults = Notification.DEFAULT_LIGHTS;
-        }
-        if (ringtone.equals("")) {
-            defaults += Notification.DEFAULT_SOUND;
-        }
-
-        //Интент запуска браузера при нажатии на уведомление
-        Intent intentBrowser = new Intent(this, SearchIntentService.class);
-        intentBrowser.setAction(ACTION_OPEN_IN_BROWSER);
-        intentBrowser.putExtra("queryId", query.getId());
-        intentBrowser.putExtra("articleId", article.getId());
-        intentBrowser.putExtra("lastDate", article.getDateCalendar(calendar));
-        intentBrowser.putExtra("queryURI", query.getURI());
-        PendingIntent piBrowser = PendingIntent.getService(this, query.getId(), intentBrowser, PendingIntent.FLAG_UPDATE_CURRENT);
-
-        //Интент записи последнего найденного объявление
-        Intent intentSetLast = new Intent(this, SearchIntentService.class);
-        int queryId = query.getId();
-        String articleId = article.getId();
-        intentSetLast.setAction(ACTION_SET_LAST_ID);
-        intentSetLast.putExtra("queryId", queryId);
-        intentSetLast.putExtra("articleId", articleId);
-        intentSetLast.putExtra("lastDate", article.getDateCalendar(calendar));
-        PendingIntent piSetLast = PendingIntent.getService(this, queryId, intentSetLast, PendingIntent.FLAG_UPDATE_CURRENT);
-
-        //Отметить как прочитанное при нажатии (также открыть браузер)
-        Notification notification = new NotificationCompat.Builder(this)
-                .setTicker("Появилось новое объявление")
-                .setSmallIcon(R.drawable.ic_result)
-                .setLargeIcon(bitmap)
-                .setColor(Color.parseColor("#1f89de"))
-                .setContentTitle(article.getTitle())
-                .setContentText(article.getPrice() + ", " + article.getDate())
-                .setSubText(query.getTitle() + article.getUnreadCountString())
-                .setContentIntent(piBrowser)
-                .setSound(Uri.parse(ringtone))
-                .setPriority(Notification.PRIORITY_HIGH)
-                .setDefaults(defaults)
-                .setAutoCancel(true)
-                .setDeleteIntent(piSetLast)
-                .addAction(new android.support.v4.app.NotificationCompat.Action(0, "Отметить как \"Прочитано\"", piSetLast))
-                .build();
-
-        query.setLastShowedId(articleId);
-        queryLab.updateQuery(query);
-
-        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
-        notificationManager.notify(query.getId(), notification);
-    }
-
-    /** Отображает уведомление о вводе капчи */
-    private void showCaptchaNotification() {
-        Intent intentBrowser = new Intent(this, EnterCaptchaActivity.class);
-        //intentBrowser.setAction(ACTION_OPEN_IN_BROWSER);
-        PendingIntent piBrowser = PendingIntent.getActivity(this, 777, intentBrowser, PendingIntent.FLAG_UPDATE_CURRENT);
-
-        Notification notification = new NotificationCompat.Builder(this)
-                .setTicker(getString(R.string.captcha))
-                .setSmallIcon(R.drawable.ic_result)
-                //.setLargeIcon(bitmap)
-                .setColor(Color.parseColor("#1f89de"))
-                .setContentTitle(getString(R.string.captcha_find))
-                .setContentText(getString(R.string.captcha_next))
-                .setSubText(getString(R.string.captcha))
-                .setContentIntent(piBrowser)
-                //.setSound(Uri.parse(ringtone))
-                .setPriority(Notification.PRIORITY_HIGH)
-                //.setDefaults(defaults)
-                .setAutoCancel(true)
-                //.setDeleteIntent(piSetLast)
-                .addAction(new android.support.v4.app.NotificationCompat.Action(0, getString(R.string.captcha_enter), piBrowser))
-                .build();
-
-        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
-        notificationManager.notify(777, notification);
     }
 
     private void setLastId(Intent intent){
