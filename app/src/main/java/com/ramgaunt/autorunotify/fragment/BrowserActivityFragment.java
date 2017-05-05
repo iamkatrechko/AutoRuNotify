@@ -2,8 +2,8 @@ package com.ramgaunt.autorunotify.fragment;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.support.v4.app.Fragment;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -39,7 +39,7 @@ public class BrowserActivityFragment extends Fragment {
     /**
      * Возвращает новый экземпляр фрагмента
      * @param uri ссылка с настройками
-     * @return
+     * @return новый экземпляр фрагмента
      */
     public static BrowserActivityFragment newInstance(String uri) {
         BrowserActivityFragment fragment = new BrowserActivityFragment();
@@ -71,7 +71,6 @@ public class BrowserActivityFragment extends Fragment {
         mWebView.getSettings().setJavaScriptEnabled(true);
 
         mWebView.loadUrl(currentURI);
-
         mWebView.setWebChromeClient(new WebChromeClient() {
             public void onProgressChanged(WebView webView, int newProgress) {
                 if (newProgress == 100) {
@@ -132,25 +131,26 @@ public class BrowserActivityFragment extends Fragment {
      * @param url Проверяемый URL
      * @return true - ссылка верная, false - ссылка не верна
      */
-    private boolean checkURL(String url){
-        ArrayList<String> URLs = new ArrayList<>();
+    private boolean checkURL(String url) {
+        /*ArrayList<String> URLs = new ArrayList<>();
         URLs.add("https://m.avito.ru/add");
         URLs.add("https://m.avito.ru/");
         URLs.add("https://m.avito.ru/favorites");
         URLs.add("https://m.avito.ru/profile");
-        if (URLs.indexOf(url) != -1){
+        if (URLs.indexOf(url) != -1) {
             Toast.makeText(getActivity(), "Не та кнопка ;)", Toast.LENGTH_SHORT).show();
             return false;
-        }else{
+        } else {
             if (url.contains("hist_back=1")) {
                 Toast.makeText(getActivity(), "Не та кнопка ;)", Toast.LENGTH_SHORT).show();
                 return false;
             }
-        }
+        }*/
         return true;
     }
 
-    private void showWebView(boolean showWebView){
+    /** Скрывает окно загрузки и отображает загруженную страницу */
+    private void showWebView(boolean showWebView) {
         mWebView.setVisibility(showWebView ? View.VISIBLE : View.GONE);
         linEmpty.setVisibility(showWebView ? View.GONE : View.VISIBLE);
     }

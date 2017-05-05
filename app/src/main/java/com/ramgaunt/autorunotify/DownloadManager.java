@@ -1,10 +1,8 @@
 package com.ramgaunt.autorunotify;
 
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.preference.PreferenceManager;
 import android.util.Log;
 
 import java.io.ByteArrayOutputStream;
@@ -30,9 +28,13 @@ public class DownloadManager {
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
 
         if (context != null) {
-            SharedPreferences defaultSharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-            //connection.setRequestProperty("User-Agent", defaultSharedPreferences.getString("useragent", ""));
-            //connection.setRequestProperty("Cookie", defaultSharedPreferences.getString("cookie", ""));
+            String cookie = PrefUtils.getCookie(context);
+            String userAgent = PrefUtils.getUserAgent(context);
+
+            if (cookie != null && userAgent != null) {
+                connection.setRequestProperty("User-Agent", userAgent);
+                connection.setRequestProperty("Cookie", cookie);
+            }
         }
 
         try {

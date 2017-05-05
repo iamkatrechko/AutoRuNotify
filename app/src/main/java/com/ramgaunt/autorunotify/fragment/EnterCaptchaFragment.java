@@ -1,9 +1,7 @@
 package com.ramgaunt.autorunotify.fragment;
 
-import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,19 +12,30 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
-import android.widget.Toast;
 
+import com.ramgaunt.autorunotify.PrefUtils;
 import com.ramgaunt.autorunotify.R;
 
-import java.util.ArrayList;
-
+/**
+ * Фрагмент ввода капчи
+ */
 public class EnterCaptchaFragment extends Fragment {
+
+    /** Тэг для логирования */
     private static String TAG = "BrowserActivityFragment";
 
+    /** Виджет браузера для отображения страницы с капчей */
     private WebView mWebView;
+    /** Окно с информацией о загрузке */
     private LinearLayout linEmpty;
+    /** Индикатор прогресса */
     private ProgressBar mProgressBar;
 
+    /**
+     * Возвращает новый экземпляр фрагмента
+     * @param uri ссылка с капчей
+     * @return новый экземпляр фрагмента
+     */
     public static EnterCaptchaFragment newInstance(String uri) {
         EnterCaptchaFragment fragment = new EnterCaptchaFragment();
 
@@ -74,20 +83,6 @@ public class EnterCaptchaFragment extends Fragment {
             @Override
             public void onPageFinished(WebView view, String url) {
                 super.onPageFinished(view, url);
-                /*String js = "javascript:document.getElementsByClassName('b-header')[0].style.display = \"none\";" +
-                        "document.getElementsByClassName('b-tabs')[0].style.display = \"none\";" +
-                        "document.getElementsByClassName('b-nav-helper')[0].style.display = \"none\";" +
-                        "document.getElementsByClassName('control-self-submit')[0].value = \"Поиск\";";
-                if (Build.VERSION.SDK_INT >= 19) {
-                    view.evaluateJavascript(js, new ValueCallback<String>() {
-                        @Override
-                        public void onReceiveValue(String s) {
-                            Log.d(TAG, "onReceiveValue");
-                        }
-                    });
-                } else {
-                    view.loadUrl(js);
-                }*/
                 showWebView(true);
             }
 
@@ -101,56 +96,20 @@ public class EnterCaptchaFragment extends Fragment {
                     int length = split.length;
                     while (i < length) {
                         if (split[i].toLowerCase().contains("spravka")) {
-                            SharedPreferences defaultSharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
-                            defaultSharedPreferences.edit().putString("cookie", CookieManager.getInstance().getCookie(url)).apply();
-                            defaultSharedPreferences.edit().putString("useragent", mWebView.getSettings().getUserAgentString()).apply();
-                            //getActivity().finish();
+                            PrefUtils.setCookie(getActivity(), CookieManager.getInstance().getCookie(url));
+                            PrefUtils.setUserAgent(getActivity(), mWebView.getSettings().getUserAgentString());
                         }
                         i++;
                     }
                 }
             }
-
-            /*
-            @Override
-            public boolean shouldOverrideUrlLoading(WebView view, String url) {
-                if (!checkURL(url)) return true;
-                Log.d(TAG, url);
-                Intent i = new Intent();
-                i.putExtra("ResultURI", url);
-                getActivity().setResult(Activity.RESULT_OK, i);
-                getActivity().finish();
-                return true;
-            }*/
         });
 
         return v;
     }
 
-    /**
-     * Проверяет URL на правильность возвращаемого адреса с параметрами поиска
-     * @param url Проверяемый URL
-     * @return true - ссылка верная, false - ссылка не верна
-     */
-    private boolean checkURL(String url){
-        ArrayList<String> URLs = new ArrayList<>();
-        URLs.add("https://m.avito.ru/add");
-        URLs.add("https://m.avito.ru/");
-        URLs.add("https://m.avito.ru/favorites");
-        URLs.add("https://m.avito.ru/profile");
-        if (URLs.indexOf(url) != -1){
-            Toast.makeText(getActivity(), "Не та кнопка ;)", Toast.LENGTH_SHORT).show();
-            return false;
-        }else{
-            if (url.contains("hist_back=1")) {
-                Toast.makeText(getActivity(), "Не та кнопка ;)", Toast.LENGTH_SHORT).show();
-                return false;
-            }
-        }
-        return true;
-    }
-
-    private void showWebView(boolean showWebView){
+    /** Скрывает окно загрузки и отображает загруженную страницу */
+    private void showWebView(boolean showWebView) {
         mWebView.setVisibility(showWebView ? View.VISIBLE : View.GONE);
         linEmpty.setVisibility(showWebView ? View.GONE : View.VISIBLE);
     }
