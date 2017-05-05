@@ -3,38 +3,52 @@ package com.ramgaunt.autorunotify.entity;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
+/**
+ * Класс сущность объявления, которое содержит всю информацию о нем, например:
+ * Заголовок, стоимость, дату объявления
+ */
 public class Article {
+
+    /** Список месяцев для отображения даты обявления */
     private String[] months = {"января", "февраля", "марта", "апреля", "мая", "июня",
             "июля", "августа", "сентября", "октября", "ноября", "декабря"};
 
+    /** Идентификатор объявления */
     private String mId;
+    /** Заголовок объявления */
     private String mTitle;
+    /** Цена в объявлении */
     private String mPrice;
+    /** Дата объявления */
     private String mDate;
-    private Integer mVip;
+    /** Признак того, что объявление является оплаченным и находится на вершине списка */
+    private boolean mVip;
+    /** URL главного изображение объявления */
     private String mImgUrl;
+    /** Количество непрочтенных объявлений */
     private int mUnreadCount;
 
-    private final String PARSE_ID_START = "data-item-id=\"";
-    private final String PARSE_ID_END = "\"";
+    /** Паттерн для поиска идентификатора */
+    private static final Pattern patternId = Pattern.compile("\"saleId\":\"(.*?)\"");
+    /** Паттерн для поиска VIP-признака */
+    private static final Pattern patternVip = Pattern.compile("\"isTop\":(.*?),");
+    /** Паттерн для поиска заголовка */
+    private static final Pattern patternTitle = Pattern.compile("\"label\":\"(.*?)\"");
+    /** Паттерн для поиска цены */
+    private static final Pattern patternPrice = Pattern.compile("\"value\":(.*?),");
+    /** Паттерн для поиска даты */
+    private static final Pattern patternDate = Pattern.compile("\"freshDate\":\"(.*?)\"");
+    /** Паттерн для поиска URL изображения */
+    private static final Pattern patternImgUrl = Pattern.compile("\"cover\":\"(.*?)\"");
 
-    private final String PARSE_TITLE_START = "<span class=\"header-text\">";
-    private final String PARSE_TITLE_END = "</span>";
-
-    private final String PARSE_PRICE_START = "<div class=\"item-price \">";
-    private final String PARSE_PRICE_END =  "</div>";
-
-    private final String PARSE_DATE_START = "<div class=\"info-date info-text\">";
-    private final String PARSE_DATE_END = "</div>";
-
-    private final String PARSE_VIP_START = "data-item-premium=\"";
-    private final String PARSE_VIP_END = "\"";
-
-    private final String PARSE_IMG_URL_START = "style=\"background-image: url(";
-    private final String PARSE_IMG_URL_END = ");\"></span>";
-
-    public Article(String HTMLtext){
+    /**
+     * Конструктор
+     * @param HTMLtext исходный HTML-текст одного объявления
+     */
+    public Article(String HTMLtext) {
         mUnreadCount = 1;
         setId(parseID(HTMLtext));
         setTitle(parseTitle(HTMLtext));
@@ -44,7 +58,7 @@ public class Article {
         setImgUrl(parseImgUrl(HTMLtext));
     }
 
-    public String getId(){
+    public String getId() {
         return mId;
     }
 
@@ -52,7 +66,7 @@ public class Article {
         mId = id;
     }
 
-    public String getTitle(){
+    public String getTitle() {
         return mTitle;
     }
 
@@ -60,7 +74,7 @@ public class Article {
         mTitle = title;
     }
 
-    public String getPrice(){
+    public String getPrice() {
         return mPrice;
     }
 
@@ -68,7 +82,7 @@ public class Article {
         mPrice = price;
     }
 
-    public String getDate(){
+    public String getDate() {
         return mDate;
     }
 
@@ -76,16 +90,20 @@ public class Article {
         mDate = date;
     }
 
-    public Integer getVIP(){
+    public boolean isVIP() {
         return mVip;
     }
 
-    public void setVip(Integer vip) {
+    public void setVip(boolean vip) {
         mVip = vip;
     }
 
     public String getImgUrl() {
-        return mImgUrl;
+        if (mImgUrl != null) {
+            return mImgUrl;
+        } else {
+            return "";
+        }
     }
 
     public void setImgUrl(String imgUrl) {
@@ -121,56 +139,64 @@ public class Article {
         mUnreadCount = unreadCount;
     }
 
-    private String parseID(String HTMLtext){
-        return parse(HTMLtext, PARSE_ID_START, PARSE_ID_END);
-    }
-
-    private String parseTitle(String HTMLtext){
-        return parse(HTMLtext, PARSE_TITLE_START, PARSE_TITLE_END);
-    }
-
-    private String parsePrice(String HTMLtext){
-        return parse(HTMLtext, PARSE_PRICE_START, PARSE_PRICE_END);
-    }
-
-    private String parseDate(String HTMLtext){
-        return parse(HTMLtext, PARSE_DATE_START, PARSE_DATE_END);
-    }
-
-    private Integer parseVIP(String HTMLtext){
-        String res = parse(HTMLtext, PARSE_VIP_START, PARSE_VIP_END);
-        if (res.equals("Не указано")){
-            return -1;
-        }else{
-            return Integer.valueOf(res);
+    private String parseID(String HTMLtext) {
+        Matcher m = patternId.matcher(HTMLtext);
+        if (m.find()) {
+            return m.group(1);
+        } else {
+            return null;
         }
     }
 
-    private String parseImgUrl(String HTMLtext){
-        return "https:" + parse(HTMLtext, PARSE_IMG_URL_START, PARSE_IMG_URL_END);
+    private String parseTitle(String HTMLtext) {
+        Matcher m = patternTitle.matcher(HTMLtext);
+        if (m.find()) {
+            return m.group(1);
+        } else {
+            return null;
+        }
     }
 
-    private String parse(String HTMLtext, String start, String end){
-        if (!HTMLtext.contains(start)){
-            return "Не указано";
+    private String parsePrice(String HTMLtext) {
+        Matcher m = patternPrice.matcher(HTMLtext);
+        if (m.find()) {
+            return m.group(1);
+        } else {
+            return null;
         }
+    }
 
-        int iStart = HTMLtext.indexOf(start) + start.length();
-        int iEnd = HTMLtext.indexOf(end, iStart);
+    private String parseDate(String HTMLtext) {
+        Matcher m = patternDate.matcher(HTMLtext);
+        if (m.find()) {
+            return m.group(1);
+        } else {
+            return null;
+        }
+    }
 
-        String result = "";
-        result = HTMLtext.substring(iStart, iEnd);
-        result = result.replaceAll("&[a-z0-9A-Z]+;", " ");                                          //Убираем escape-последовательности
-        result = result.replaceAll("<span class=\"nobr\">", "");
-        result = result.trim();                                                                     //Убираем пробелы по краям
+    private boolean parseVIP(String HTMLtext) {
+        Matcher m = patternVip.matcher(HTMLtext);
+        if (m.find()) {
+            return Boolean.parseBoolean(m.group(1));
+        } else {
+            return false;
+        }
+    }
 
-        return result;
+    private String parseImgUrl(String HTMLtext) {
+        Matcher m = patternImgUrl.matcher(HTMLtext);
+        if (m.find()) {
+            return "https:" + m.group(1);
+        } else {
+            return null;
+        }
     }
 
     /**
      * Инкрементирует количество новых объявлений для данного экземпляра
      */
-    public void incrementUnreadCount(){
+    public void incrementUnreadCount() {
         mUnreadCount++;
     }
 

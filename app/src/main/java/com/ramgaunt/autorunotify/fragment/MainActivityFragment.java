@@ -35,6 +35,7 @@ import com.ramgaunt.autorunotify.dialog.DialogInfoFragment;
 import com.ramgaunt.autorunotify.dialog.DialogReviewFragment;
 import com.ramgaunt.autorunotify.Methods;
 import com.ramgaunt.autorunotify.activity.NotWorkActivity;
+import com.ramgaunt.autorunotify.entity.Article;
 import com.ramgaunt.autorunotify.entity.Query;
 import com.ramgaunt.autorunotify.QueryLab;
 import com.ramgaunt.autorunotify.R;
@@ -137,7 +138,10 @@ public class MainActivityFragment extends Fragment {
                     i.putExtra("ID", -1);
                     startActivity(i);
                 }*/
-                new ass().execute("");
+                //new ass().execute("");
+                Intent i = new Intent(getActivity(), SearchIntentService.class);
+                i.putExtra("ID", 1);
+                getActivity().startService(i);
             }
         });
 
@@ -151,10 +155,10 @@ public class MainActivityFragment extends Fragment {
         return v;
     }
 
-    class ass extends AsyncTask<String, String, List<String>> {
+    class ass extends AsyncTask<String, String, List<Article>> {
 
         @Override
-        protected List<String> doInBackground(String... strings) {
+        protected List<Article> doInBackground(String... strings) {
             String s = "";
             try {
                 s = new DownloadManager().getUrlString("https://m.auto.ru/cars/lexus/gx/all/?image=true&sort_offers=cr_date-DESC&page_num_offers=1");
@@ -162,11 +166,12 @@ public class MainActivityFragment extends Fragment {
                 e.printStackTrace();
             }
 
-            return new ArticleSearcher().parse(s);
+            //return new ArticleSearcher().parse(s);
+            return null;
         }
 
         @Override
-        protected void onPostExecute(List<String> s) {
+        protected void onPostExecute(List<Article> s) {
             super.onPostExecute(s);
             Toast.makeText(getActivity(), "Найдено  объявлений: " + s.size(), Toast.LENGTH_SHORT).show();
 

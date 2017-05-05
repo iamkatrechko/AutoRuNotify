@@ -105,11 +105,12 @@ public class SearchIntentService extends IntentService {
             if (article != null) {
                 //Log.d(TAG, "Появилось новое объявление");
 
-                if (query.getLastShowedId().equals(article.getId())){
+                /*if (query.getLastShowedId().equals(article.getId())){
                     //Log.d(TAG, "Данное объявление уже активно на экране");
                 }else{
                     showNotification(query, article);
-                }
+                }*/
+                showNotification(query, article);
             } else {
                 //Log.d(TAG, "Новых объявлений нет");
             }

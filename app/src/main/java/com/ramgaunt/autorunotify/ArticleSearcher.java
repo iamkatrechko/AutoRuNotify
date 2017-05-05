@@ -7,20 +7,20 @@ import com.ramgaunt.autorunotify.entity.Query;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 
 public class ArticleSearcher {
     private DownloadManager mDownloadManager;
 
-    public ArticleSearcher(){
+    public ArticleSearcher() {
         mDownloadManager = new DownloadManager();
     }
 
     public Article checkUpdate(Context context, Query query) {
         String result = "";
         try {
-            result = mDownloadManager.getUrlString(query.getURI());
+            //result = mDownloadManager.getUrlString(query.getURI());
+            result = mDownloadManager.getUrlString("https://m.auto.ru/cars/lexus/gx/all/?image=true&sort_offers=cr_date-DESC&page_num_offers=1");
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -28,11 +28,11 @@ public class ArticleSearcher {
         return getLast(result, query);
     }
 
-    private Article getLast(String result, Query query){
+    private Article getLast(String result, Query query) {
         Article articleNew = null;
 
         //Если есть результаты
-        if (result.contains("<article")) {
+        /*if (result.contains("<article")) {
             int indexEnd = 0;
             int indexStart = result.indexOf("<article", indexEnd);
             while (indexStart != -1) {
@@ -46,7 +46,7 @@ public class ArticleSearcher {
                 }
 
                 Article article = new Article(articleHTML);
-                if (article.getVIP() == 0) {
+                if (article.isVIP() == 0) {
                     //Если это первый поиск
                     if (query.getLastId().equals("-1")) {
                         article.setUnreadCount(0);
@@ -80,25 +80,44 @@ public class ArticleSearcher {
             return articleNew;
         }else{
             return null;
+        }*/
+
+        for (Article article : getAllArticles(result)) {
+            if (article.isVIP()) {
+                // Если объявление оплаченное, не рассматриваем его
+                continue;
+            }
+
+            /*if (article.getId().equals(query.getLastId())) {
+                return null;
+            }*/
+
+
+            return article;
         }
+
+        return null;
     }
 
-    public List<String> parse(String HTMLtext) {
-        List<String> result = new ArrayList<>();
+    /**
+     * Возвращает список всех скачанных объявлений
+     * @param HTMLText исходная HTML-строка страницы со всеми объявлениями
+     * @return список всех скачанных объявлений
+     */
+    private List<Article> getAllArticles(String HTMLText) {
+        List<Article> result = new ArrayList<>();
 
-
-        //String start = "listing-item listing-item_view_columns";
-        String start = "class=\"commercial-listing-item\"";
-        String end = "</div></div></div>";
+        String start = "{\"isFetching\":false,\"isFavoriteProcessing\":false";
+        String end = "}}},";
 
         int indexEnd = 0;
-        int indexStart = HTMLtext.indexOf(start, indexEnd);
+        int indexStart = HTMLText.indexOf(start, indexEnd);
         while (indexStart != -1) {
-            indexEnd = HTMLtext.indexOf(end, indexStart) + end.length();
-            String articleHTML = HTMLtext.substring(indexStart, indexEnd);
+            indexEnd = HTMLText.indexOf(end, indexStart) + end.length();
+            String articleHTML = HTMLText.substring(indexStart, indexEnd);
 
-            result.add(articleHTML);
-            indexStart = HTMLtext.indexOf(start, indexEnd);
+            result.add(new Article(articleHTML));
+            indexStart = HTMLText.indexOf(start, indexEnd);
         }
 
         return result;
