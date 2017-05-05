@@ -24,6 +24,7 @@ import com.ramgaunt.autorunotify.ArticleSearcher;
 import com.ramgaunt.autorunotify.DownloadManager;
 import com.ramgaunt.autorunotify.QueryLab;
 import com.ramgaunt.autorunotify.R;
+import com.ramgaunt.autorunotify.activity.EnterCaptchaActivity;
 import com.ramgaunt.autorunotify.entity.Article;
 import com.ramgaunt.autorunotify.entity.Query;
 
@@ -110,6 +111,10 @@ public class SearchIntentService extends IntentService {
                 }else{
                     showNotification(query, article);
                 }*/
+                if (article.getTitle().equals("Капча")) {
+                    showCaptchaNotification();
+                    return;
+                }
                 showNotification(query, article);
             } else {
                 //Log.d(TAG, "Новых объявлений нет");
@@ -268,6 +273,33 @@ public class SearchIntentService extends IntentService {
 
         NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
         notificationManager.notify(query.getId(), notification);
+    }
+
+    /** Отображает уведомление о вводе капчи */
+    private void showCaptchaNotification() {
+        Intent intentBrowser = new Intent(this, EnterCaptchaActivity.class);
+        //intentBrowser.setAction(ACTION_OPEN_IN_BROWSER);
+        PendingIntent piBrowser = PendingIntent.getActivity(this, 777, intentBrowser, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        Notification notification = new NotificationCompat.Builder(this)
+                .setTicker(getString(R.string.captcha))
+                .setSmallIcon(R.drawable.ic_result)
+                //.setLargeIcon(bitmap)
+                .setColor(Color.parseColor("#1f89de"))
+                .setContentTitle(getString(R.string.captcha_find))
+                .setContentText(getString(R.string.captcha_next))
+                .setSubText(getString(R.string.captcha))
+                .setContentIntent(piBrowser)
+                //.setSound(Uri.parse(ringtone))
+                .setPriority(Notification.PRIORITY_HIGH)
+                //.setDefaults(defaults)
+                .setAutoCancel(true)
+                //.setDeleteIntent(piSetLast)
+                .addAction(new android.support.v4.app.NotificationCompat.Action(0, getString(R.string.captcha_enter), piBrowser))
+                .build();
+
+        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
+        notificationManager.notify(777, notification);
     }
 
     private void setLastId(Intent intent){

@@ -131,17 +131,13 @@ public class MainActivityFragment extends Fragment {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                /*if (queryLab.getCount() >= mMethods.getAllowedSearches()){
+                if (queryLab.getCount() >= mMethods.getAllowedSearches()){
                     showDialog(DIALOG_BUY);
                 }else{
                     Intent i = new Intent(getActivity(), CreateActivity.class);
                     i.putExtra("ID", -1);
                     startActivity(i);
-                }*/
-                //new ass().execute("");
-                Intent i = new Intent(getActivity(), SearchIntentService.class);
-                i.putExtra("ID", 1);
-                getActivity().startService(i);
+                }
             }
         });
 
@@ -152,30 +148,16 @@ public class MainActivityFragment extends Fragment {
         if (mMethods.getStartCount() == 1){
             showDialog(DIALOG_HOW_IT_WORK);
         }
-        return v;
-    }
 
-    class ass extends AsyncTask<String, String, List<Article>> {
-
-        @Override
-        protected List<Article> doInBackground(String... strings) {
-            String s = "";
-            try {
-                s = new DownloadManager().getUrlString("https://m.auto.ru/cars/lexus/gx/all/?image=true&sort_offers=cr_date-DESC&page_num_offers=1");
-            } catch (IOException e) {
-                e.printStackTrace();
+        v.findViewById(R.id.button_test).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent i = new Intent(getActivity(), SearchIntentService.class);
+                i.putExtra("ID", 1);
+                getActivity().startService(i);
             }
-
-            //return new ArticleSearcher().parse(s);
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(List<Article> s) {
-            super.onPostExecute(s);
-            Toast.makeText(getActivity(), "Найдено  объявлений: " + s.size(), Toast.LENGTH_SHORT).show();
-
-        }
+        });
+        return v;
     }
 
     @Override
@@ -211,10 +193,11 @@ public class MainActivityFragment extends Fragment {
             case R.id.action_review:
                 mMethods.mGoToGooglePlay();
                 break;
-            case R.id.action_settings:
+            case R.id.action_settings: {
                 Intent i = new Intent(getActivity(), SettingsActivity.class);
                 startActivity(i);
                 break;
+            }
             case R.id.action_info:
                 showDialog(DIALOG_INFO);
                 break;

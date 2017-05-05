@@ -33,6 +33,10 @@
             android:label="@string/title_activity_browser"
             android:theme="@style/AppTheme.NoActionBar"/>
         <activity
+            android:name=".activity.EnterCaptchaActivity"
+            android:label="@string/captcha"
+            android:theme="@style/AppTheme.NoActionBar"/>
+        <activity
             android:name=".activity.SettingsActivity"
             android:label="Настройки"
             android:parentActivityName=".activity.MainActivity">

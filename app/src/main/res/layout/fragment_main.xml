@@ -1,10 +1,15 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              xmlns:tools="http://schemas.android.com/tools"
               android:layout_width="match_parent"
               android:layout_height="match_parent"
               android:orientation="vertical"
-              tools:context="com.iamkatrechko.avitonotify.fragment.MainActivityFragment"
     >
+
+    <Button
+        android:id="@+id/button_test"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Тестовое уведомление"
+        />
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/section_list"
@@ -13,11 +18,11 @@
         android:visibility="gone"/>
 
     <LinearLayout
-        android:orientation="vertical"
+        android:id="@+id/linEmpty"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/linEmpty"
-        android:gravity="center">
+        android:gravity="center"
+        android:orientation="vertical">
 
         <ImageView
             android:layout_width="128dp"
@@ -28,10 +33,10 @@
         <TextView
             android:layout_width="270dp"
             android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
             android:text="Чтобы создать новый поиск, нажмите кнопку '+'"
             android:textColor="#a0a0a0"
-            android:textSize="17sp"
-            android:gravity="center_horizontal"/>
+            android:textSize="17sp"/>
     </LinearLayout>
 
 </LinearLayout>

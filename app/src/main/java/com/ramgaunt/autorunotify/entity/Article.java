@@ -44,6 +44,10 @@ public class Article {
     /** Паттерн для поиска URL изображения */
     private static final Pattern patternImgUrl = Pattern.compile("\"cover\":\"(.*?)\"");
 
+    public Article(String s, boolean s2) {
+        mTitle = s;
+    }
+
     /**
      * Конструктор
      * @param HTMLtext исходный HTML-текст одного объявления

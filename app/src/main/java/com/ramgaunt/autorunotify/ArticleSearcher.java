@@ -20,7 +20,7 @@ public class ArticleSearcher {
         String result = "";
         try {
             //result = mDownloadManager.getUrlString(query.getURI());
-            result = mDownloadManager.getUrlString("https://m.auto.ru/cars/lexus/gx/all/?image=true&sort_offers=cr_date-DESC&page_num_offers=1");
+            result = mDownloadManager.getUrlString(context, "https://m.auto.ru/cars/lexus/gx/all/?image=true&sort_offers=cr_date-DESC&page_num_offers=1");
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -82,6 +82,10 @@ public class ArticleSearcher {
             return null;
         }*/
 
+        if (result.contains("Ой!")) {
+            return new Article("Капча", false);
+        }
+
         for (Article article : getAllArticles(result)) {
             if (article.isVIP()) {
                 // Если объявление оплаченное, не рассматриваем его
@@ -91,7 +95,6 @@ public class ArticleSearcher {
             /*if (article.getId().equals(query.getLastId())) {
                 return null;
             }*/
-
 
             return article;
         }

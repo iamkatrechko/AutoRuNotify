@@ -1,7 +1,11 @@
 package com.ramgaunt.autorunotify;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.preference.PreferenceManager;
+import android.webkit.CookieManager;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -11,9 +15,16 @@ import java.net.URL;
 
 public class DownloadManager {
 
-    public byte[] getUrlBytes(String urlSpec) throws IOException {
+    public byte[] getUrlBytes(Context context, String urlSpec) throws IOException {
         URL url = new URL(urlSpec);
         HttpURLConnection connection = (HttpURLConnection)url.openConnection();
+
+        if (context != null) {
+            SharedPreferences defaultSharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+            //connection.setRequestProperty("User-Agent", defaultSharedPreferences.getString("useragent", ""));
+            //connection.setRequestProperty("Cookie", defaultSharedPreferences.getString("cookie", ""));
+        }
+
         try {
             ByteArrayOutputStream out = new ByteArrayOutputStream();
             InputStream in = connection.getInputStream();
@@ -34,8 +45,16 @@ public class DownloadManager {
         }
     }
 
+    public byte[] getUrlBytes(String urlSpec) throws IOException {
+        return getUrlBytes(null, urlSpec);
+    }
+
     public String getUrlString(String urlSpec) throws IOException {
         return new String(getUrlBytes(urlSpec));
+    }
+
+    public String getUrlString(Context context, String urlSpec) throws IOException {
+        return new String(getUrlBytes(context, urlSpec));
     }
 
     public Bitmap getUrlBitmap(String URI){
