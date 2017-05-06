@@ -2,22 +2,24 @@ package com.ramgaunt.autorunotify.fragment;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
-import android.widget.Toast;
 
 import com.ramgaunt.autorunotify.R;
 
-import java.util.ArrayList;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Фрагмент для отображения окна браузера с настройками поиска
@@ -26,6 +28,11 @@ public class BrowserActivityFragment extends Fragment {
 
     /** Тэг для логов */
     private static final String TAG = "BrowserActivityFragment";
+
+    /** Паттер для нахождение параметра поиска на кнопку "Показать" */
+    private static final Pattern patternUrl = Pattern.compile("filters__submit-button[^>]*>[^>]*href=\\\\\"(.*?)\\\\\"");
+    /** Параметры поиска по умолчанию */
+    private static final String DEFAULT_URL = "https://m.auto.ru/cars/all/?sort_offers=cr_date-DESC";
 
     /** Текущая ссылка с настройками */
     private String currentURI;
@@ -75,6 +82,31 @@ public class BrowserActivityFragment extends Fragment {
             public void onProgressChanged(WebView webView, int newProgress) {
                 if (newProgress == 100) {
                     mProgressBar.setVisibility(View.GONE);
+
+                    // Скрываем лишние кнопки на странице и возвращаем код всей загруженной страницы
+                    String js = "document.getElementsByClassName('filters__submit-button')[0].style.display = \"none\";" +
+                            "document.getElementsByClassName('header__navburger')[0].style.display = \"none\";" +
+                            "document.getElementsByClassName('header__logo')[0].style.display = \"none\";" +
+                            "(function(){return window.document.body.outerHTML})();";
+                    if (Build.VERSION.SDK_INT >= 19) {
+                        webView.evaluateJavascript(js, new ValueCallback<String>() {
+                            @Override
+                            public void onReceiveValue(String s) {
+                                // Парсим код всей загруженной страницы на предмет настроек поиска,
+                                // который находится в свойствах кнопка поиска
+                                Matcher m = patternUrl.matcher(s);
+                                if (m.find()) {
+                                    currentURI = "https://m.auto.ru" + m.group(1);
+                                } else {
+                                    currentURI = DEFAULT_URL;
+                                }
+                                Log.d(TAG, "onReceiveValue");
+                            }
+                        });
+                    } else {
+                        webView.loadUrl(js);
+                    }
+                    showWebView(true);
                 } else {
                     mProgressBar.setVisibility(View.VISIBLE);
                     mProgressBar.setProgress(newProgress);
@@ -86,7 +118,7 @@ public class BrowserActivityFragment extends Fragment {
             @Override
             public void onPageFinished(WebView view, String url) {
                 super.onPageFinished(view, url);
-                /*String js = "javascript:document.getElementsByClassName('b-header')[0].style.display = \"none\";" +
+                String js = "javascript:document.getElementsByClassName('b-header')[0].style.display = \"none\";" +
                         "document.getElementsByClassName('b-tabs')[0].style.display = \"none\";" +
                         "document.getElementsByClassName('b-nav-helper')[0].style.display = \"none\";" +
                         "document.getElementsByClassName('control-self-submit')[0].value = \"Поиск\";";
@@ -99,7 +131,7 @@ public class BrowserActivityFragment extends Fragment {
                     });
                 } else {
                     view.loadUrl(js);
-                }*/
+                }
                 showWebView(true);
             }
 

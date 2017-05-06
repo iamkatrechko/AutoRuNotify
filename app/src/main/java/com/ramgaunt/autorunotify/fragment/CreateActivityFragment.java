@@ -220,23 +220,25 @@ public class CreateActivityFragment extends Fragment implements View.OnClickList
             // Вызывается при настройках автопоиска
             String URI = data.getStringExtra("ResultURI");
             if (URI != null) {
-                if (URI.contains(APPEND_URI_SORT)) {
+                tvURI.setText(URI);
+                /*if (URI.contains(APPEND_URI_SORT)) {
                     tvURI.setText(URI);
                 } else {
                     tvURI.setText(URI + APPEND_URI_SORT);
-                }
+                }*/
             }
         }
     }
 
     /** Возвращает параметры настроек */
     private String getParametrs() {
-        String URI = tvURI.getText().toString();
+        return "https://m.auto.ru/cars/all/filters/";
+        /*String URI = tvURI.getText().toString();
         if (URI.equals("Нажмите для настройки")) {
             return MAIN_URI;
         }
 
-        return URI;
+        return URI;*/
     }
 
     /** Устанавливает наименование периода поиска */
