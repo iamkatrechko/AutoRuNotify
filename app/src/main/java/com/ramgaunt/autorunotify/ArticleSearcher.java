@@ -99,10 +99,10 @@ public class ArticleSearcher {
                 continue;
             }
 
-            /*if (article.getId().equals(query.getLastId())) {
+            if (article.getId().equals(query.getLastId())) {
                 // Если первое отображаемое объявление равно ранее сохраненному -> новых нет
                 return null;
-            }*/
+            }
 
             return article;
         }

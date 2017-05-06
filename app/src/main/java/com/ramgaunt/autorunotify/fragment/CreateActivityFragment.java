@@ -220,12 +220,12 @@ public class CreateActivityFragment extends Fragment implements View.OnClickList
             // Вызывается при настройках автопоиска
             String URI = data.getStringExtra("ResultURI");
             if (URI != null) {
-                tvURI.setText(URI);
-                /*if (URI.contains(APPEND_URI_SORT)) {
+                //tvURI.setText(URI);
+                if (URI.contains(APPEND_URI_SORT)) {
                     tvURI.setText(URI);
                 } else {
                     tvURI.setText(URI + APPEND_URI_SORT);
-                }*/
+                }
             }
         }
     }

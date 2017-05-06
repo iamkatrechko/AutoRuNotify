@@ -99,14 +99,13 @@ public class SearchIntentService extends IntentService {
                     mNotificationsManager.showCaptchaNotification(query.getURI());
                     return;
                 }
-                /*if (query.getLastShowedId().equals(article.getId())) {
+                if (query.getLastShowedId().equals(article.getId())) {
                     // Если данное объявление уже отображалось, либо уже находится на экране
                     Log.d(TAG, "Данное объявление уже активно на экране");
-                }else{
+                } else {
+                    // Иначе -> отображаем уведомление
                     mNotificationsManager.showNotification(query, article);
-                }*/
-
-                mNotificationsManager.showNotification(query, article);
+                }
             } else {
                 Log.d(TAG, "Новых объявлений нет");
             }
