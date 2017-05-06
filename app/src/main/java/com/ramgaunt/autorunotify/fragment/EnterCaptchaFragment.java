@@ -105,11 +105,12 @@ public class EnterCaptchaFragment extends Fragment {
                     }
                 //}
 
-                if (!url.contains("/showcaptcha") && previousLoadUrl.contains("/checkcaptcha")) {
+                // Отключил
+                /*if (!url.contains("/showcaptcha") && previousLoadUrl.contains("/checkcaptcha")) {
                     // Если капча введена -> закрываем
                     getActivity().finish();
                 }
-                previousLoadUrl = url;
+                previousLoadUrl = url;*/
             }
         });
 
