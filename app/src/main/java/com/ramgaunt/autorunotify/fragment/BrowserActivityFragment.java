@@ -150,6 +150,8 @@ public class BrowserActivityFragment extends Fragment {
             }
         });
 
+        currentURI = DEFAULT_URL;
+
         mButtonSave.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
