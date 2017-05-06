@@ -3,7 +3,6 @@ package com.ramgaunt.autorunotify.activity;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentManager;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
@@ -23,13 +22,8 @@ public class EnterCaptchaActivity extends AppCompatActivity {
         setContentView(R.layout.activity_browser);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        ActionBar actionBar = getSupportActionBar();
-        if (actionBar != null) {
-            // Show the Up button in the action bar.
-            actionBar.setDisplayHomeAsUpEnabled(true);
-        }
 
-        String URI = "https://m.auto.ru/cars/lexus/gx/all/?image=true&sort_offers=cr_date-DESC&page_num_offers=1";
+        String URI = getIntent().getStringExtra("URL");
 
         FragmentManager fragmentManager = getSupportFragmentManager();
         if (fragmentManager.getFragments() == null) {

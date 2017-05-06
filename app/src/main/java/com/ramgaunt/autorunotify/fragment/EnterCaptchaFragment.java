@@ -91,7 +91,7 @@ public class EnterCaptchaFragment extends Fragment {
                 super.onPageStarted(view, url, favicon);
                 String cookie = CookieManager.getInstance().getCookie(url);
                 int i = 0;
-                if (!url.contains("captcha") && cookie.contains("spravka")) {
+                //if (cookie.contains("spravka")) {
                     String[] split = cookie.split(";");
                     int length = split.length;
                     while (i < length) {
@@ -101,7 +101,7 @@ public class EnterCaptchaFragment extends Fragment {
                         }
                         i++;
                     }
-                }
+                //}
             }
         });
 

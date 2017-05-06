@@ -96,7 +96,7 @@ public class SearchIntentService extends IntentService {
 
                 if (article.isCaptcha()) {
                     // Если необходимо ввести капчу
-                    mNotificationsManager.showCaptchaNotification();
+                    mNotificationsManager.showCaptchaNotification(query.getURI());
                     return;
                 }
                 /*if (query.getLastShowedId().equals(article.getId())) {

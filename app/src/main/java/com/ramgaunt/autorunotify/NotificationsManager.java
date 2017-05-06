@@ -105,10 +105,11 @@ public class NotificationsManager {
     }
 
     /** Отображает уведомление о необходимости ввода капчи */
-    public void showCaptchaNotification() {
-        Intent intentBrowser = new Intent(mContext, EnterCaptchaActivity.class);
-        //intentBrowser.setAction(ACTION_OPEN_IN_BROWSER);
-        PendingIntent piBrowser = PendingIntent.getActivity(mContext, 777, intentBrowser, PendingIntent.FLAG_UPDATE_CURRENT);
+    public void showCaptchaNotification(String URL) {
+        Intent intentCaptcha = new Intent(mContext, EnterCaptchaActivity.class);
+        intentCaptcha.putExtra("URL", URL);
+        //intentCaptcha.setAction(ACTION_OPEN_IN_BROWSER);
+        PendingIntent piBrowser = PendingIntent.getActivity(mContext, 777, intentCaptcha, PendingIntent.FLAG_UPDATE_CURRENT);
 
         Notification notification = new NotificationCompat.Builder(mContext)
                 .setTicker(mContext.getString(R.string.captcha))
