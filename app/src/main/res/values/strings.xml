@@ -36,7 +36,7 @@
 
     <string name="captcha">Капча</string>
     <string name="captcha_find">Найдена капча</string>
-    <string name="captcha_next">Для продолжение необходимо ввести капчу. Нажмите на уведомление</string>
+    <string name="captcha_next">Нажмите на уведомление, чтобы ввести капчу</string>
     <string name="captcha_enter">Ввести капчу</string>
     <string name="captcha_enter_help">Введите капчу и нажмите кнопку назад</string>
 

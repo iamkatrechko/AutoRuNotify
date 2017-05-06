@@ -30,6 +30,8 @@ public class EnterCaptchaFragment extends Fragment {
     private LinearLayout linEmpty;
     /** Индикатор прогресса */
     private ProgressBar mProgressBar;
+    /** Последний загруженный URL */
+    private String previousLoadUrl = "";
 
     /**
      * Возвращает новый экземпляр фрагмента
@@ -102,6 +104,12 @@ public class EnterCaptchaFragment extends Fragment {
                         i++;
                     }
                 //}
+
+                if (!url.contains("/showcaptcha") && previousLoadUrl.contains("/checkcaptcha")) {
+                    // Если капча введена -> закрываем
+                    getActivity().finish();
+                }
+                previousLoadUrl = url;
             }
         });
 

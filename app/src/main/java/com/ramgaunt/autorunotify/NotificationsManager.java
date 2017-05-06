@@ -43,7 +43,6 @@ public class NotificationsManager {
     public void showNotification(Query query, Article article) {
         Calendar calendar = Calendar.getInstance();
 
-
         DownloadManager downloadManager = new DownloadManager();
         Bitmap bitmap = downloadManager.getUrlBitmap(mContext, article.getImgUrl());
 
@@ -106,9 +105,22 @@ public class NotificationsManager {
 
     /** Отображает уведомление о необходимости ввода капчи */
     public void showCaptchaNotification(String URL) {
+        String ringtone = mPreferenceManager.getString("notifications_new_message_ringtone", "");
+        boolean vibration = mPreferenceManager.getBoolean("notifications_new_message", true);
+
+        int defaults;
+        if (vibration) {
+            defaults = Notification.DEFAULT_VIBRATE | Notification.DEFAULT_LIGHTS;
+        } else {
+            defaults = Notification.DEFAULT_LIGHTS;
+        }
+        if (ringtone.equals("")) {
+            defaults += Notification.DEFAULT_SOUND;
+        }
+
         Intent intentCaptcha = new Intent(mContext, EnterCaptchaActivity.class);
         intentCaptcha.putExtra("URL", URL);
-        //intentCaptcha.setAction(ACTION_OPEN_IN_BROWSER);
+        intentCaptcha.setAction("null");
         PendingIntent piBrowser = PendingIntent.getActivity(mContext, 777, intentCaptcha, PendingIntent.FLAG_UPDATE_CURRENT);
 
         Notification notification = new NotificationCompat.Builder(mContext)
@@ -122,10 +134,10 @@ public class NotificationsManager {
                 .setContentIntent(piBrowser)
                 //.setSound(Uri.parse(ringtone))
                 .setPriority(Notification.PRIORITY_HIGH)
-                //.setDefaults(defaults)
+                .setDefaults(defaults)
                 .setAutoCancel(true)
                 //.setDeleteIntent(piSetLast)
-                .addAction(new android.support.v4.app.NotificationCompat.Action(0, mContext.getString(R.string.captcha_enter), piBrowser))
+                //.addAction(new android.support.v4.app.NotificationCompat.Action(0, mContext.getString(R.string.captcha_enter), piBrowser))
                 .build();
 
         NotificationManagerCompat notificationManager = NotificationManagerCompat.from(mContext);
