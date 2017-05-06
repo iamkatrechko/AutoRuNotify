@@ -53,26 +53,14 @@ public class Methods {
     }
 
     private int getLevelPref(){
-        return prefs.getInt("per_seconds", LEVEL_0);
+        return prefs.getInt("per_seconds", LEVEL_3);
     }
 
     public void setLevelPref(int level){
         int LEVEL_CODE;
         switch (level){
-            case 0:
-                LEVEL_CODE = LEVEL_0;
-                break;
-            case 1:
-                LEVEL_CODE = LEVEL_1;
-                break;
-            case 2:
-                LEVEL_CODE = LEVEL_2;
-                break;
-            case 3:
-                LEVEL_CODE = LEVEL_3;
-                break;
             default:
-                LEVEL_CODE = LEVEL_0;
+                LEVEL_CODE = LEVEL_3;
                 break;
         }
         Log.d("Methods", "Установка уровня: " + level);
@@ -91,16 +79,8 @@ public class Methods {
     public int getAllowedSearches(){
         int level = getPLevel();
         switch (level){
-            case 0:
-                return 1;
-            case 1:
-                return 5;
-            case 2:
-                return 10;
-            case 3:
-                return 100000;
             default:
-                return 1;
+                return 1000;
         }
     }
 
