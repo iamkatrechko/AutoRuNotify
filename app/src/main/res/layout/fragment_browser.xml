@@ -82,6 +82,7 @@
         android:background="#303030"
         android:text="@string/search_settings_save"
         android:textColor="#ffffff"
+        android:visibility="gone"
         />
 
 </LinearLayout>

@@ -13,6 +13,7 @@ import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 
@@ -43,6 +44,8 @@ public class BrowserActivityFragment extends Fragment {
     /** Индикатор прогресса */
     private ProgressBar mProgressBar;
 
+    private Button mButtonSave;
+
     /**
      * Возвращает новый экземпляр фрагмента
      * @param uri ссылка с настройками
@@ -67,6 +70,8 @@ public class BrowserActivityFragment extends Fragment {
         mWebView = (WebView) v.findViewById(R.id.webView);
         linEmpty = (LinearLayout) v.findViewById(R.id.linEmpty);
         mProgressBar = (ProgressBar) v.findViewById(R.id.fragment_photo_page_progress_bar);
+        mButtonSave = (Button) v.findViewById(R.id.button_save_settings);
+
         v.findViewById(R.id.button3).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -145,7 +150,7 @@ public class BrowserActivityFragment extends Fragment {
             }
         });
 
-        v.findViewById(R.id.button_save_settings).setOnClickListener(new View.OnClickListener() {
+        mButtonSave.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent i = new Intent();
@@ -184,6 +189,7 @@ public class BrowserActivityFragment extends Fragment {
     /** Скрывает окно загрузки и отображает загруженную страницу */
     private void showWebView(boolean showWebView) {
         mWebView.setVisibility(showWebView ? View.VISIBLE : View.GONE);
+        mButtonSave.setVisibility(showWebView ? View.VISIBLE : View.GONE);
         linEmpty.setVisibility(showWebView ? View.GONE : View.VISIBLE);
     }
 }
